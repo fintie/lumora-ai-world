@@ -1,0 +1,8 @@
+.state-grid .growth-stat {
+  grid-column: 1 / -1;
+  background: linear-gradient(90deg, #f7f0d9, #eef6e9);
+}
+
+.growth-stat em {
+  background: linear-gradient(90deg, #d5a749, #65a97e);
+}
