@@ -6,3 +6,218 @@
 .growth-stat em {
   background: linear-gradient(90deg, #d5a749, #65a97e);
 }
+
+/* Reference-inspired command center layout */
+.app-shell {
+  grid-template-rows: 52px 92px minmax(0, 1fr) 118px 26px;
+  background: #f7f6f1;
+}
+.topbar {
+  border-bottom: 0;
+  background: #f7f6f1;
+}
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 0 14px 10px;
+  background: #f7f6f1;
+}
+.metric-card {
+  position: relative;
+  overflow: hidden;
+  padding: 11px 13px 9px;
+  border: 1px solid #e8e6df;
+  border-radius: 11px;
+  background: #fffefa;
+  box-shadow: 0 2px 10px #4b58440a;
+}
+.metric-card > span {
+  color: #7b827a;
+  font-size: 9px;
+}
+.metric-card div {
+  margin-top: 3px;
+  line-height: 1;
+}
+.metric-card b {
+  font:
+    650 24px/1 Georgia,
+    serif;
+  color: #27332d;
+}
+.metric-card small {
+  margin-left: 4px;
+  color: #9aa097;
+  font-size: 8px;
+}
+.metric-card p {
+  margin: 5px 0 0;
+  color: #9a9e96;
+  font-size: 7px;
+}
+.metric-card i {
+  position: absolute;
+  right: 12px;
+  top: 34px;
+  width: 43px;
+  height: 2px;
+  background: #e8e9e2;
+}
+.metric-card em {
+  display: block;
+  height: 100%;
+  background: #82936d;
+}
+.workspace {
+  grid-template-columns: 224px minmax(0, 1fr) 286px;
+  gap: 10px;
+  padding: 0 14px 10px;
+  background: #f7f6f1;
+}
+.left-rail,
+.world-panel,
+.inspector {
+  border: 1px solid #e4e6df;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px #3343390c;
+}
+.left-rail {
+  padding: 15px 13px;
+  overflow: auto;
+  background: #fffefa;
+}
+.rail-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rail-heading span {
+  font:
+    700 13px Georgia,
+    serif;
+}
+.rail-heading small {
+  color: #a0a59e;
+  font-size: 7px;
+  letter-spacing: 0.12em;
+}
+.rail-copy {
+  margin: 5px 0 15px;
+  color: #8b918a;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.left-rail .people-panel {
+  border-top: 1px solid #edf0e9;
+  padding-top: 12px;
+}
+.left-rail .people-list {
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.left-rail .people-list button {
+  min-height: 43px;
+  border-color: #ecece5;
+  background: #f8f8f4;
+}
+.left-rail .people-list button.selected {
+  background: #eef2e8;
+  border-color: #aebd9e;
+}
+.left-rail .project-panel {
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid #edf0e9;
+}
+.left-rail .project-line {
+  grid-template-columns: 30px 1fr 29px;
+  padding: 7px;
+}
+.left-rail .project-icon {
+  width: 28px;
+  height: 28px;
+}
+.left-rail .resources {
+  flex-direction: column;
+  gap: 5px;
+}
+.world-panel {
+  border-right: 1px solid #e4e6df;
+  background: #dce9df;
+}
+.inspector {
+  padding: 15px;
+  background: #fffefa;
+}
+.bottom-dock {
+  display: block;
+  margin: 0 14px 8px 248px;
+  border: 1px solid #e4e6df;
+  border-radius: 11px;
+  background: #fffefa;
+  box-shadow: 0 3px 14px #3343390b;
+}
+.bottom-dock > div {
+  padding: 11px 15px;
+  border-right: 0;
+}
+.event-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 11px;
+}
+.event-list > div {
+  grid-template-columns: 31px 7px 1fr;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .metric-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .metric-card:nth-child(n + 4) {
+    display: none;
+  }
+  .workspace {
+    grid-template-columns: 190px minmax(0, 1fr) 250px;
+  }
+  .bottom-dock {
+    margin-left: 214px;
+  }
+}
+@media (max-width: 680px) {
+  .app-shell {
+    grid-template-rows: 58px auto 520px auto 28px;
+  }
+  .metric-strip {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 8px;
+  }
+  .metric-card:nth-child(3) {
+    display: none;
+  }
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: 420px auto auto;
+    padding: 0 8px 8px;
+  }
+  .world-panel {
+    grid-row: 1;
+  }
+  .left-rail {
+    grid-row: 2;
+  }
+  .inspector {
+    grid-row: 3;
+  }
+  .left-rail .people-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bottom-dock {
+    margin: 0 8px 8px;
+  }
+  .event-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
