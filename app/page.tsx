@@ -850,7 +850,96 @@ export default function Home() {
           </button>
         </div>
       </header>
+      <section className="metric-strip" aria-label="世界指标">
+        {[
+          ["居民人口", agents.length, "6 位活跃居民"],
+          ["食物储备", 82, "今日净增 +4.5"],
+          ["知识总量", Math.round(knowledge), "研究持续积累"],
+          ["聚落幸福度", 68, "关系与需求综合"],
+          ["社会凝聚力", 57, "信任网络稳定"],
+        ].map(([label, value, note], index) => (
+          <article className="metric-card" key={String(label)}>
+            <span>{label}</span>
+            <div>
+              <b>{value}</b>
+              <small>{index === 0 ? "人" : "/100"}</small>
+            </div>
+            <p>{note}</p>
+            <i>
+              <em
+                style={{
+                  width: `${Math.min(100, Number(value) * (index === 0 ? 12 : 1))}%`,
+                }}
+              />
+            </i>
+          </article>
+        ))}
+      </section>
       <section className="workspace">
+        <aside className="left-rail">
+          <div className="rail-heading">
+            <span>改变世界</span>
+            <small>ACTIONS</small>
+          </div>
+          <p className="rail-copy">
+            观察社区、配置建设，并查看居民此刻的协作。
+          </p>
+          <div className="people-panel">
+            <div className="dock-title">
+              <span>
+                <Users size={15} /> 居民名册
+              </span>
+              <small>{agents.length} 在线</small>
+            </div>
+            <div className="people-list">
+              {agents.map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => setSelected(a.id)}
+                  className={selected === a.id ? "selected" : ""}
+                >
+                  <span className="mini-avatar" style={{ background: a.color }}>
+                    {a.name.slice(-1)}
+                  </span>
+                  <span>
+                    <b>{a.name}</b>
+                    <small>{a.action}</small>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="project-panel">
+            <div className="dock-title">
+              <span>
+                <Bot size={15} /> 共同建设
+              </span>
+              <small>{completed} 座完成</small>
+            </div>
+            <div className="project-line">
+              <div className="project-icon">⌂</div>
+              <div>
+                <b>{PROJECTS[completed % PROJECTS.length].name}</b>
+                <small>凯洛 · 言川</small>
+                <i>
+                  <em style={{ width: `${progress}%` }} />
+                </i>
+              </div>
+              <strong>{Math.round(progress)}%</strong>
+            </div>
+            <div className="resources">
+              <span>
+                木材 <b>{Math.round(wood)}</b>
+              </span>
+              <span>
+                知识 <b>{Math.round(knowledge)}</b>
+              </span>
+              <span>
+                食物 <b>82</b>
+              </span>
+            </div>
+          </div>
+        </aside>
         <div className="world-panel">
           <Canvas
             shadows
@@ -1011,61 +1100,6 @@ export default function Home() {
         </aside>
       </section>
       <section className="bottom-dock">
-        <div className="people-panel">
-          <div className="dock-title">
-            <span>
-              <Users size={15} /> 居民
-            </span>
-            <small>{agents.length} 位在线</small>
-          </div>
-          <div className="people-list">
-            {agents.map((a) => (
-              <button
-                key={a.id}
-                onClick={() => setSelected(a.id)}
-                className={selected === a.id ? "selected" : ""}
-              >
-                <span className="mini-avatar" style={{ background: a.color }}>
-                  {a.name.slice(-1)}
-                </span>
-                <span>
-                  <b>{a.name}</b>
-                  <small>{a.action}</small>
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="project-panel">
-          <div className="dock-title">
-            <span>
-              <Bot size={15} /> 协作项目
-            </span>
-            <small>{completed} 座建成 · 2 人协作中</small>
-          </div>
-          <div className="project-line">
-            <div className="project-icon">⌂</div>
-            <div>
-              <b>{PROJECTS[completed % PROJECTS.length].name}</b>
-              <small>凯洛 · 言川</small>
-              <i>
-                <em style={{ width: `${progress}%` }} />
-              </i>
-            </div>
-            <strong>{Math.round(progress)}%</strong>
-          </div>
-          <div className="resources">
-            <span>
-              木材 <b>{Math.round(wood)}</b>
-            </span>
-            <span>
-              知识 <b>{Math.round(knowledge)}</b>
-            </span>
-            <span>
-              食物 <b>82</b>
-            </span>
-          </div>
-        </div>
         <div className="event-panel">
           <div className="dock-title">
             <span>
