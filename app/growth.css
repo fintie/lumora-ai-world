@@ -70,10 +70,13 @@
   background: #82936d;
 }
 .workspace {
-  grid-template-columns: 224px minmax(0, 1fr) 286px;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  grid-template-rows: auto auto;
   gap: 10px;
   padding: 0 14px 10px;
   background: #f7f6f1;
+  overflow-y: auto;
+  align-items: start;
 }
 .left-rail,
 .world-panel,
@@ -83,8 +86,10 @@
   box-shadow: 0 4px 18px #3343390c;
 }
 .left-rail {
+  grid-column: 2;
+  grid-row: 1;
   padding: 15px 13px;
-  overflow: auto;
+  overflow: visible;
   background: #fffefa;
 }
 .rail-heading {
@@ -143,16 +148,26 @@
   gap: 5px;
 }
 .world-panel {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: sticky;
+  top: 0;
+  align-self: stretch;
+  min-height: 520px;
+  height: 100%;
   border-right: 1px solid #e4e6df;
   background: #dce9df;
 }
 .inspector {
+  grid-column: 2;
+  grid-row: 2;
   padding: 15px;
   background: #fffefa;
+  overflow: visible;
 }
 .bottom-dock {
   display: block;
-  margin: 0 14px 8px 248px;
+  margin: 0 14px 8px;
   border: 1px solid #e4e6df;
   border-radius: 11px;
   background: #fffefa;
@@ -172,6 +187,28 @@
   min-width: 0;
 }
 
+.left-rail .people-list button,
+.left-rail .project-line,
+.inspector .identity,
+.inspector .state-grid > div,
+.inspector .info-card,
+.inspector .detail-section {
+  box-shadow: 0 3px 12px #34463a0a;
+}
+.inspector .identity,
+.inspector .detail-section {
+  padding: 12px;
+  border: 1px solid #e8ebe4;
+  border-radius: 10px;
+  background: #fbfcf8;
+}
+.inspector .detail-section {
+  margin-top: 9px;
+}
+.inspector .detail-section h2 {
+  margin-bottom: 10px;
+}
+
 @media (max-width: 900px) {
   .metric-strip {
     grid-template-columns: repeat(3, 1fr);
@@ -180,10 +217,7 @@
     display: none;
   }
   .workspace {
-    grid-template-columns: 190px minmax(0, 1fr) 250px;
-  }
-  .bottom-dock {
-    margin-left: 214px;
+    grid-template-columns: minmax(0, 1fr) 300px;
   }
 }
 @media (max-width: 680px) {
@@ -201,14 +235,20 @@
     grid-template-columns: 1fr;
     grid-template-rows: 420px auto auto;
     padding: 0 8px 8px;
+    overflow: visible;
   }
   .world-panel {
+    grid-column: 1;
     grid-row: 1;
+    position: relative;
+    min-height: 420px;
   }
   .left-rail {
+    grid-column: 1;
     grid-row: 2;
   }
   .inspector {
+    grid-column: 1;
     grid-row: 3;
   }
   .left-rail .people-list {
