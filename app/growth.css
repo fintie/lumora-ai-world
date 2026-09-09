@@ -261,3 +261,206 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Lumora cinematic forest theme */
+:root {
+  --ink: #efe7d4;
+  --muted: #9f9b8b;
+  --line: #34463b;
+  --paper: #0b1511;
+  --green: #d0a85a;
+}
+body,
+.app-shell,
+.topbar,
+.metric-strip,
+.workspace {
+  background: #08110d;
+}
+.topbar {
+  border-bottom: 1px solid #27372e;
+}
+.brand-mark,
+.primary {
+  background: linear-gradient(145deg, #d7ad59, #80652d);
+  color: #14130d;
+  border-color: #d7ad59;
+  box-shadow: 0 0 20px #d7ad5930;
+}
+.brand b {
+  color: #f5ddb0;
+  text-shadow: 0 0 16px #e5b55d33;
+}
+.brand small,
+.world-status,
+.metric-card > span,
+.metric-card p {
+  color: #8f978e;
+}
+.world-status b {
+  color: #e7c77d;
+}
+.dot {
+  background: #dfbd68;
+  box-shadow:
+    0 0 0 4px #d8aa4d1c,
+    0 0 12px #d8aa4d;
+}
+.icon-button {
+  background: #111d17;
+  border-color: #304238;
+  color: #d9c79e;
+}
+.metric-card,
+.left-rail,
+.inspector,
+.bottom-dock {
+  background: linear-gradient(160deg, #14221b, #0d1712);
+  border-color: #2f4237;
+  box-shadow:
+    0 8px 28px #0008,
+    inset 0 1px #ffffff05;
+}
+.metric-card b,
+.rail-heading span,
+.section-heading h1,
+.dock-title > span {
+  color: #f0e5cd;
+}
+.metric-card i {
+  background: #26372e;
+}
+.metric-card em,
+.state-grid em,
+.project-line em,
+.relations em {
+  background: linear-gradient(90deg, #8c7138, #e1bd6b);
+}
+.world-panel {
+  background: #07110d;
+  border-color: #384a3d;
+  box-shadow:
+    0 10px 40px #000c,
+    0 0 0 1px #c69c4930;
+}
+.world-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 52% 48%, transparent 42%, #02080570 100%),
+    linear-gradient(180deg, #06100b30, transparent 35%, #02060455);
+}
+.world-panel > canvas {
+  position: relative;
+  z-index: 0;
+}
+.scene-title,
+.camera-tools,
+.speed-controls {
+  z-index: 2;
+  background: #101b16e8;
+  border-color: #425342;
+  color: #e8d7b5;
+  backdrop-filter: blur(12px);
+}
+.camera-tools button.active,
+.speed-controls button.active {
+  background: #d4ad5b;
+  color: #17150e;
+}
+.world-label {
+  background: #0a120eea;
+  border-color: #caa653 !important;
+  color: #f1ddb0;
+  box-shadow: 0 0 14px #d2a64b35;
+}
+.agent-bubble {
+  background: #101a16ef;
+  border-color: #465647;
+  color: #f4e5c5;
+  box-shadow: 0 5px 20px #0009;
+}
+.agent-bubble span {
+  color: #b7b3a5;
+}
+.agent-bubble i {
+  background: #493d24;
+  color: #f0d28e;
+}
+.left-rail .people-panel,
+.left-rail .project-panel,
+.detail-section {
+  border-color: #2b3b32;
+}
+.left-rail .people-list button,
+.left-rail .project-line,
+.inspector .identity,
+.inspector .detail-section {
+  background: #111d17;
+  border-color: #2c4034;
+  color: #ddd5c1;
+}
+.left-rail .people-list button.selected {
+  background: #362f1e;
+  border-color: #c8a351;
+  box-shadow: 0 0 18px #d1a54e22;
+}
+.mini-avatar,
+.portrait {
+  box-shadow:
+    inset 0 0 0 2px #ffffff1a,
+    0 0 16px #0008;
+}
+.state-grid > div {
+  background: #101b16;
+  border-color: #2f4137;
+}
+.state-grid i,
+.project-line i,
+.relations i {
+  background: #26352d;
+}
+.state-grid .growth-stat {
+  background: linear-gradient(90deg, #2b2619, #17241a);
+}
+.info-card {
+  background: #282316;
+  color: #e7d8b4;
+}
+.info-card p {
+  color: #f0dfbd;
+}
+.card-label {
+  color: #ddb969;
+}
+.goal-icon {
+  background: #332c1b;
+  color: #dfbd6b;
+}
+.memory,
+.relations button {
+  color: #b6b2a3;
+}
+.follow-button {
+  background: linear-gradient(90deg, #92743b, #d1aa59);
+  color: #15130d;
+}
+.resources span {
+  background: #101a15;
+  border-color: #283930;
+  color: #8f998f;
+}
+.event-list p {
+  color: #c7c2b3;
+}
+.event-list > div:not(:last-child) p {
+  border-color: #27372f;
+}
+footer {
+  background: #050b08;
+  color: #777f77;
+  border-top: 1px solid #203027;
+}
