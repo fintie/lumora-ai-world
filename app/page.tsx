@@ -405,7 +405,12 @@ function Avatar({
       new THREE.Vector3(target.x, 0.06, target.z),
       Math.min(1, dt * 0.28 * speed),
     );
-    ref.current.lookAt(target.x, 0.75, target.z);
+    // Keep the robot upright: only calculate heading on the horizontal plane.
+    // Looking at a higher Y value tilted the entire group and made it appear
+    // to walk on its side.
+    ref.current.lookAt(target.x, ref.current.position.y, target.z);
+    ref.current.rotation.x = 0;
+    ref.current.rotation.z = 0;
     const swing = walking
       ? Math.sin(state.clock.elapsedTime * 6 * speed) * 0.55
       : 0;
