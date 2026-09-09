@@ -262,15 +262,15 @@ function Tree({ x, z, s = 1 }: { x: number; z: number; s?: number }) {
     <group position={[x, 0, z]} scale={s}>
       <mesh position={[0, 0.85, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.25, 1.7, 7]} />
-        <meshStandardMaterial color="#74533b" />
+        <meshStandardMaterial color="#3e3022" roughness={1} />
       </mesh>
       <mesh position={[0, 2, 0]} castShadow>
         <coneGeometry args={[1.05, 2.4, 8]} />
-        <meshStandardMaterial color="#2f7d55" roughness={0.9} />
+        <meshStandardMaterial color="#173e29" roughness={0.95} />
       </mesh>
       <mesh position={[0.2, 2.7, 0.1]} castShadow>
         <coneGeometry args={[0.75, 1.6, 8]} />
-        <meshStandardMaterial color="#469268" roughness={0.9} />
+        <meshStandardMaterial color="#28583a" roughness={0.95} />
       </mesh>
     </group>
   );
@@ -294,11 +294,14 @@ function House({
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color={research ? "#aec9c2" : "#e7d3ae"} />
+        <meshStandardMaterial
+          color={research ? "#364946" : "#5c4937"}
+          roughness={0.86}
+        />
       </RoundedBox>
       <mesh position={[0, 2.15, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
         <coneGeometry args={[2.25, 1.4, 4]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={color} roughness={0.9} />
       </mesh>
       <mesh position={[0, 0.65, 1.23]}>
         <boxGeometry args={[0.58, 1.25, 0.08]} />
@@ -307,11 +310,17 @@ function House({
       <mesh position={[-0.8, 1.15, 1.25]}>
         <boxGeometry args={[0.55, 0.55, 0.08]} />
         <meshStandardMaterial
-          color="#9fd9e6"
-          emissive="#8fcbdc"
-          emissiveIntensity={0.15}
+          color="#ffd47a"
+          emissive="#ff9b3d"
+          emissiveIntensity={3.2}
         />
       </mesh>
+      <pointLight
+        position={[-0.8, 1.2, 1.8]}
+        color="#ffae55"
+        intensity={2.2}
+        distance={5}
+      />
     </group>
   );
 }
@@ -405,7 +414,7 @@ function Avatar({
     if (leftLeg.current) leftLeg.current.rotation.x = -swing * 0.65;
     if (rightLeg.current) rightLeg.current.rotation.x = swing * 0.65;
   });
-  const skin = agent.accent;
+  const glow = selected ? "#ffe493" : "#9ff7ff";
   return (
     <group
       ref={ref}
@@ -421,69 +430,113 @@ function Avatar({
           <meshBasicMaterial color="#f5da73" transparent opacity={0.85} />
         </mesh>
       )}
-      <mesh position={[0, 1.15, 0]} castShadow>
-        <capsuleGeometry args={[0.26, 0.55, 6, 12]} />
-        <meshStandardMaterial color={agent.color} />
-      </mesh>
-      <mesh position={[0, 1.72, 0]} castShadow>
-        <sphereGeometry args={[0.29, 16, 16]} />
-        <meshStandardMaterial color={skin} />
-      </mesh>
-      <mesh position={[0, 1.94, -0.02]}>
-        <sphereGeometry args={[0.3, 12, 12]} />
-        <meshStandardMaterial color="#3c302a" />
-      </mesh>
-      <mesh position={[0, 1.84, 0.2]}>
-        <boxGeometry args={[0.56, 0.28, 0.27]} />
-        <meshStandardMaterial color={skin} />
-      </mesh>
-      <mesh position={[-0.1, 1.83, 0.35]}>
-        <sphereGeometry args={[0.025, 8, 8]} />
-        <meshBasicMaterial color="#273038" />
-      </mesh>
-      <mesh position={[0.1, 1.83, 0.35]}>
-        <sphereGeometry args={[0.025, 8, 8]} />
-        <meshBasicMaterial color="#273038" />
-      </mesh>
-      <group ref={leftArm} position={[-0.34, 1.35, 0]}>
-        <mesh position={[0, -0.28, 0]}>
-          <capsuleGeometry args={[0.08, 0.48, 4, 8]} />
-          <meshStandardMaterial color={agent.color} />
+      <RoundedBox
+        args={[0.7, 0.72, 0.55]}
+        radius={0.2}
+        smoothness={5}
+        position={[0, 1.08, 0]}
+        castShadow
+      >
+        <meshStandardMaterial
+          color={agent.color}
+          metalness={0.35}
+          roughness={0.32}
+        />
+      </RoundedBox>
+      <RoundedBox
+        args={[0.78, 0.6, 0.62]}
+        radius={0.24}
+        smoothness={6}
+        position={[0, 1.75, 0]}
+        castShadow
+      >
+        <meshStandardMaterial
+          color={agent.color}
+          metalness={0.42}
+          roughness={0.25}
+        />
+      </RoundedBox>
+      <RoundedBox
+        args={[0.62, 0.36, 0.08]}
+        radius={0.12}
+        smoothness={6}
+        position={[0, 1.74, 0.34]}
+      >
+        <meshStandardMaterial
+          color="#071116"
+          metalness={0.65}
+          roughness={0.12}
+        />
+      </RoundedBox>
+      {[-0.15, 0.15].map((x) => (
+        <mesh key={x} position={[x, 1.75, 0.395]}>
+          <capsuleGeometry args={[0.035, 0.09, 5, 10]} />
+          <meshStandardMaterial
+            color={glow}
+            emissive={glow}
+            emissiveIntensity={4}
+          />
         </mesh>
-        <mesh position={[0, -0.62, 0]}>
-          <sphereGeometry args={[0.09, 8, 8]} />
-          <meshStandardMaterial color={skin} />
+      ))}
+      <mesh position={[0, 2.13, 0]}>
+        <cylinderGeometry args={[0.018, 0.018, 0.22, 8]} />
+        <meshStandardMaterial color="#84939a" metalness={0.8} />
+      </mesh>
+      <mesh position={[0, 2.27, 0]}>
+        <sphereGeometry args={[0.055, 10, 10]} />
+        <meshStandardMaterial
+          color={agent.accent}
+          emissive={agent.accent}
+          emissiveIntensity={2.5}
+        />
+      </mesh>
+      <group ref={leftArm} position={[-0.43, 1.32, 0]}>
+        <mesh position={[0, -0.23, 0]}>
+          <capsuleGeometry args={[0.08, 0.3, 4, 8]} />
+          <meshStandardMaterial color={agent.color} metalness={0.4} />
+        </mesh>
+        <mesh position={[0, -0.47, 0]}>
+          <sphereGeometry args={[0.1, 10, 10]} />
+          <meshStandardMaterial color="#a8b0ac" metalness={0.7} />
         </mesh>
       </group>
-      <group ref={rightArm} position={[0.34, 1.35, 0]}>
-        <mesh position={[0, -0.28, 0]}>
-          <capsuleGeometry args={[0.08, 0.48, 4, 8]} />
-          <meshStandardMaterial color={agent.color} />
+      <group ref={rightArm} position={[0.43, 1.32, 0]}>
+        <mesh position={[0, -0.23, 0]}>
+          <capsuleGeometry args={[0.08, 0.3, 4, 8]} />
+          <meshStandardMaterial color={agent.color} metalness={0.4} />
         </mesh>
-        <mesh position={[0, -0.62, 0]}>
-          <sphereGeometry args={[0.09, 8, 8]} />
-          <meshStandardMaterial color={skin} />
-        </mesh>
-      </group>
-      <group ref={leftLeg} position={[-0.14, 0.82, 0]}>
-        <mesh position={[0, -0.35, 0]}>
-          <capsuleGeometry args={[0.1, 0.55, 4, 8]} />
-          <meshStandardMaterial color="#3c5661" />
-        </mesh>
-        <mesh position={[0, -0.73, 0.08]}>
-          <boxGeometry args={[0.2, 0.13, 0.36]} />
-          <meshStandardMaterial color="#273038" />
+        <mesh position={[0, -0.47, 0]}>
+          <sphereGeometry args={[0.1, 10, 10]} />
+          <meshStandardMaterial color="#a8b0ac" metalness={0.7} />
         </mesh>
       </group>
-      <group ref={rightLeg} position={[0.14, 0.82, 0]}>
-        <mesh position={[0, -0.35, 0]}>
-          <capsuleGeometry args={[0.1, 0.55, 4, 8]} />
-          <meshStandardMaterial color="#3c5661" />
+      <group ref={leftLeg} position={[-0.2, 0.75, 0]}>
+        <mesh position={[0, -0.25, 0]}>
+          <capsuleGeometry args={[0.1, 0.32, 4, 8]} />
+          <meshStandardMaterial color="#77848a" metalness={0.6} />
         </mesh>
-        <mesh position={[0, -0.73, 0.08]}>
-          <boxGeometry args={[0.2, 0.13, 0.36]} />
-          <meshStandardMaterial color="#273038" />
+        <RoundedBox
+          args={[0.25, 0.16, 0.38]}
+          radius={0.07}
+          smoothness={3}
+          position={[0, -0.5, 0.08]}
+        >
+          <meshStandardMaterial color="#11191c" />
+        </RoundedBox>
+      </group>
+      <group ref={rightLeg} position={[0.2, 0.75, 0]}>
+        <mesh position={[0, -0.25, 0]}>
+          <capsuleGeometry args={[0.1, 0.32, 4, 8]} />
+          <meshStandardMaterial color="#77848a" metalness={0.6} />
         </mesh>
+        <RoundedBox
+          args={[0.25, 0.16, 0.38]}
+          radius={0.07}
+          smoothness={3}
+          position={[0, -0.5, 0.08]}
+        >
+          <meshStandardMaterial color="#11191c" />
+        </RoundedBox>
       </group>
       <Billboard position={[0, 2.5, 0]}>
         <Html center>
@@ -525,7 +578,6 @@ function Scene({
   speed,
   follow,
   progress,
-  minute,
   completed,
 }: {
   agents: Agent[];
@@ -535,10 +587,8 @@ function Scene({
   speed: number;
   follow: string | null;
   progress: number;
-  minute: number;
   completed: number;
 }) {
-  const night = minute < 360 || minute > 1140;
   const trees = useMemo(
     () => [
       [-10, -8, 1.2],
@@ -563,20 +613,20 @@ function Scene({
   );
   return (
     <>
-      <color attach="background" args={[night ? "#15263d" : "#b9d9cf"]} />
-      <fog attach="fog" args={[night ? "#15263d" : "#b9d9cf", 18, 42]} />
-      <ambientLight intensity={night ? 0.35 : 1.05} />
+      <color attach="background" args={["#07130f"]} />
+      <fog attach="fog" args={["#081710", 15, 38]} />
+      <ambientLight intensity={0.3} color="#6f8c79" />
       <directionalLight
         position={[10, 14, 6]}
-        intensity={night ? 0.7 : 2.1}
-        color={night ? "#8cb8ff" : "#fff0cf"}
+        intensity={1.15}
+        color="#e5b76c"
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
-      {night && <Stars radius={50} depth={20} count={800} factor={2} fade />}
+      <Stars radius={50} depth={20} count={500} factor={1.5} fade />
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[18, 64]} />
-        <meshStandardMaterial color="#65915f" roughness={1} />
+        <meshStandardMaterial color="#243e2a" roughness={1} />
       </mesh>
       <mesh
         position={[0, 0.015, 0]}
@@ -584,11 +634,11 @@ function Scene({
         receiveShadow
       >
         <planeGeometry args={[4.2, 30]} />
-        <meshStandardMaterial color="#cbbd97" />
+        <meshStandardMaterial color="#6b5b3e" roughness={1} />
       </mesh>
       <mesh position={[-2, 0.025, 1]} rotation={[-Math.PI / 2, 0, -1.12]}>
         <planeGeometry args={[2.6, 17]} />
-        <meshStandardMaterial color="#cbbd97" />
+        <meshStandardMaterial color="#6b5b3e" roughness={1} />
       </mesh>
       {trees.map((t, i) => (
         <Tree key={i} x={t[0]} z={t[1]} s={t[2]} />
@@ -670,7 +720,7 @@ function Scene({
         maxPolarAngle={Math.PI / 2.1}
         target={[0, 1, 0]}
       />
-      <Environment preset="forest" environmentIntensity={night ? 0.08 : 0.35} />
+      <Environment preset="forest" environmentIntensity={0.12} />
     </>
   );
 }
@@ -954,7 +1004,6 @@ export default function Home() {
               speed={speed}
               follow={follow}
               progress={progress}
-              minute={minute}
               completed={completed}
             />
           </Canvas>
