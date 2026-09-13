@@ -71,36 +71,36 @@ const PEOPLE: Agent[] = [
   {
     id: "lin",
     name: "林岚",
-    role: "生态学家",
+    role: "生成式 AI 研究员",
     color: "#ff8d5c",
     accent: "#ffd3bd",
-    personality: "好奇、温和、重视证据",
-    goal: "建立森林生态档案",
-    skills: ["观察", "研究"],
+    personality: "好奇、严谨、重视可复现性",
+    goal: "训练可解释的校园多智能体模型",
+    skills: ["模型训练", "评测"],
     action: "探索",
-    thought: "北侧林地的苔藓分布很反常。",
-    reason: "知识储备不足，优先调查未知区域",
-    memory: ["苏禾愿意共享土壤样本"],
+    thought: "代理的协作涌现需要一组消融实验。",
+    reason: "当前评测证据不足，优先补齐对照组",
+    memory: ["苏禾愿意共享隐私计算数据集"],
     energy: 88,
     social: 72,
     pos: [-7, 0, -3],
     target: [-2, 0, -7],
-    speech: "我去看看北坡。",
+    speech: "谁来复核这组推理轨迹？",
     relations: { su: 74, yan: 58, kai: 42 },
   },
   {
     id: "kai",
     name: "凯洛",
-    role: "建造师",
+    role: "智能合约工程师",
     color: "#f8c44f",
     accent: "#fff0ae",
     personality: "务实、果断、有保护欲",
-    goal: "完成公共观测站",
-    skills: ["建造", "规划"],
+    goal: "完成可信科研协作协议",
+    skills: ["Solidity", "协议设计"],
     action: "采集",
-    thought: "还差一些木材就能搭起主梁。",
-    reason: "观测站项目当前缺少木材",
-    memory: ["言川答应下午协助施工"],
+    thought: "激励函数还需要处理女巫攻击。",
+    reason: "协议审计发现边界条件，优先修复",
+    memory: ["言川答应协助进行形式化验证"],
     energy: 76,
     social: 61,
     pos: [5, 0, 5],
@@ -110,16 +110,16 @@ const PEOPLE: Agent[] = [
   {
     id: "su",
     name: "苏禾",
-    role: "农艺师",
+    role: "隐私计算学者",
     color: "#76d49b",
     accent: "#c9f5d7",
     personality: "耐心、乐于协作",
-    goal: "让聚落实现食物自给",
-    skills: ["种植", "照料"],
+    goal: "实现保护隐私的科研数据共享",
+    skills: ["零知识证明", "联邦学习"],
     action: "工作",
-    thought: "温室幼苗需要在日落前浇水。",
-    reason: "作物健康度下降，先处理高优先需求",
-    memory: ["林岚发现了新的授粉路径"],
+    thought: "这份医学数据可以用联邦学习联合建模。",
+    reason: "数据不可出域，选择隐私保护实验",
+    memory: ["林岚的基线模型通过了隐私预算测试"],
     energy: 68,
     social: 89,
     pos: [-4, 0, 5],
@@ -129,56 +129,56 @@ const PEOPLE: Agent[] = [
   {
     id: "yan",
     name: "言川",
-    role: "工程师",
+    role: "机器人系统工程师",
     color: "#6aa8ff",
     accent: "#c8ddff",
     personality: "理性、专注、略显固执",
-    goal: "建成自循环能源网络",
-    skills: ["工程", "维修"],
+    goal: "让具身智能安全参与实验室协作",
+    skills: ["机器人", "强化学习"],
     action: "建造",
-    thought: "支撑结构可以减少 12% 的用料。",
-    reason: "拥有最高工程能力且与凯洛信任度高",
-    memory: ["上次独自施工导致体力透支"],
+    thought: "策略网络在真实机械臂上仍有 sim-to-real 偏差。",
+    reason: "拥有最高机器人能力且与凯洛信任度高",
+    memory: ["上次并行实验因算力不足而中断"],
     energy: 63,
     social: 48,
     pos: [3, 0, -5],
     target: [1, 0, -2],
-    speech: "凯洛，结构图我改好了。",
+    speech: "凯洛，合约验证结果出来了。",
     relations: { kai: 81, nova: 39, lin: 58 },
   },
   {
     id: "mio",
     name: "米欧",
-    role: "信使",
+    role: "去中心化治理研究员",
     color: "#bf8cff",
     accent: "#e7d0ff",
     personality: "外向、机敏、爱讲故事",
-    goal: "连接所有人的信息孤岛",
-    skills: ["沟通", "探索"],
+    goal: "设计开放且抗操纵的科研 DAO",
+    skills: ["治理", "机制设计"],
     action: "交流",
-    thought: "诺瓦还不知道研究区的发现。",
-    reason: "检测到团队之间的信息差",
-    memory: ["凯洛喜欢直接、简短的汇报"],
+    thought: "诺瓦还没看到治理实验的投票偏差。",
+    reason: "检测到研究小组之间的信息差",
+    memory: ["凯洛偏好可验证、简短的提案"],
     energy: 91,
     social: 95,
     pos: [0, 0, 6],
     target: [-1, 0, 1],
-    speech: "大家，北坡有新发现！",
+    speech: "新的 DAO 提案已进入同行评审！",
     relations: { kai: 55, su: 70, nova: 78 },
   },
   {
     id: "nova",
     name: "诺瓦",
-    role: "系统研究员",
+    role: "分布式系统研究员",
     color: "#ff6d91",
     accent: "#ffc6d3",
     personality: "大胆、独立、追求突破",
-    goal: "解码遗迹中的信号",
-    skills: ["分析", "实验"],
+    goal: "构建可扩展的去中心化 AI 网络",
+    skills: ["共识协议", "分布式训练"],
     action: "研究",
-    thought: "样本序列里出现了重复脉冲。",
+    thought: "异步节点间出现了可复现的共识分叉。",
     reason: "新信息与长期目标高度相关",
-    memory: ["苏禾的菌丝样本放大了信号"],
+    memory: ["苏禾的零知识电路降低了验证成本"],
     energy: 57,
     social: 54,
     pos: [7, 0, -6],
@@ -191,21 +191,26 @@ const START_EVENTS: EventItem[] = [
     id: 1,
     time: "08:14",
     kind: "talk",
-    text: "米欧向团队分享了北坡的最新发现",
+    text: "米欧发起「AI 科研 DAO」治理机制研讨",
   },
   {
     id: 2,
     time: "08:09",
     kind: "work",
-    text: "言川加入「森林观测站」建设项目",
+    text: "言川加入「具身智能实验室」联合实验",
   },
   {
     id: 3,
     time: "07:58",
     kind: "memory",
-    text: "林岚记住了苏禾关于菌丝网络的观察",
+    text: "林岚记录了苏禾关于零知识数据证明的建议",
   },
-  { id: 4, time: "07:42", kind: "world", text: "晨光出现，太阳能产出开始回升" },
+  {
+    id: 4,
+    time: "07:42",
+    kind: "world",
+    text: "晨间算力窗口开启，训练资源开始回升",
+  },
 ];
 const TARGETS: [number, number, number][] = [
   [-8, 0, -6],
@@ -218,32 +223,32 @@ const TARGETS: [number, number, number][] = [
 ];
 const PROJECTS = [
   {
-    name: "AI 研究中心",
+    name: "多智能体研究中心",
     pos: [2.8, 0, -2] as [number, number, number],
     color: "#678c75",
   },
   {
-    name: "工程创新工坊",
+    name: "具身智能实验室",
     pos: [-2.5, 0, -6] as [number, number, number],
     color: "#a66f4c",
   },
   {
-    name: "校园生态温室",
+    name: "隐私计算实验室",
     pos: [-8, 0, 0] as [number, number, number],
     color: "#72a88c",
   },
   {
-    name: "可持续能源塔",
+    name: "去中心化算力塔",
     pos: [8, 0, 0] as [number, number, number],
     color: "#d1a34f",
   },
   {
-    name: "数字知识馆",
+    name: "链上知识图谱馆",
     pos: [2, 0, 7] as [number, number, number],
     color: "#7289a9",
   },
   {
-    name: "校园健康中心",
+    name: "AI 安全评测中心",
     pos: [-5, 0, -5] as [number, number, number],
     color: "#c47c78",
   },
@@ -421,7 +426,13 @@ function GothicHall({ position = [0, 0, -5] as [number, number, number] }) {
   );
 }
 
-function ModernLab({ position }: { position: [number, number, number] }) {
+function ModernLab({
+  position,
+  glow = "#8de7df",
+}: {
+  position: [number, number, number];
+  glow?: string;
+}) {
   return (
     <group position={position}>
       <RoundedBox
@@ -440,8 +451,8 @@ function ModernLab({ position }: { position: [number, number, number] }) {
       <mesh position={[0, 1.35, 1.53]}>
         <planeGeometry args={[3.3, 1.35]} />
         <meshStandardMaterial
-          color="#8cc5c3"
-          emissive="#4e9fa0"
+          color={glow}
+          emissive={glow}
           emissiveIntensity={1.1}
           metalness={0.4}
         />
@@ -452,10 +463,94 @@ function ModernLab({ position }: { position: [number, number, number] }) {
       </mesh>
       <pointLight
         position={[0, 1.6, 2.5]}
-        color="#8de7df"
+        color={glow}
         intensity={2.2}
         distance={7}
       />
+    </group>
+  );
+}
+
+function ResearchDome({
+  position,
+  label,
+  color,
+}: {
+  position: [number, number, number];
+  label: string;
+  color: string;
+}) {
+  return (
+    <group position={position} scale={0.82}>
+      <mesh position={[0, 0.85, 0]} castShadow>
+        <cylinderGeometry args={[1.65, 1.85, 1.7, 12]} />
+        <meshStandardMaterial color="#33413d" roughness={0.5} metalness={0.3} />
+      </mesh>
+      <mesh position={[0, 1.72, 0]} castShadow>
+        <sphereGeometry args={[1.68, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.48}
+          transparent
+          opacity={0.72}
+          metalness={0.45}
+        />
+      </mesh>
+      <mesh position={[0, 0.75, 1.72]}>
+        <boxGeometry args={[0.72, 1.22, 0.12]} />
+        <meshStandardMaterial color="#1b2423" />
+      </mesh>
+      <pointLight
+        position={[0, 1.8, 0]}
+        color={color}
+        intensity={2.4}
+        distance={7}
+      />
+      <WorldLabel position={[0, 3.25, 0]} color={color}>
+        {label}
+      </WorldLabel>
+    </group>
+  );
+}
+
+function Classroom({
+  position,
+  label,
+  color,
+}: {
+  position: [number, number, number];
+  label: string;
+  color: string;
+}) {
+  return (
+    <group position={position} scale={0.78}>
+      <RoundedBox
+        args={[4.4, 1.8, 2.4]}
+        radius={0.12}
+        smoothness={4}
+        position={[0, 0.9, 0]}
+        castShadow
+      >
+        <meshStandardMaterial color="#8d6748" roughness={0.86} />
+      </RoundedBox>
+      {[-1.35, -0.45, 0.45, 1.35].map((x) => (
+        <mesh key={x} position={[x, 1.05, 1.23]}>
+          <boxGeometry args={[0.58, 0.72, 0.08]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={1.25}
+          />
+        </mesh>
+      ))}
+      <mesh position={[0, 2, 0]} rotation={[0, 0, 0]} castShadow>
+        <boxGeometry args={[4.65, 0.28, 2.7]} />
+        <meshStandardMaterial color="#3d3933" metalness={0.25} />
+      </mesh>
+      <WorldLabel position={[0, 2.85, 0]} color={color}>
+        {label}
+      </WorldLabel>
     </group>
   );
 }
@@ -810,9 +905,33 @@ function Scene({
       <Jacaranda x={-4.6} z={0.8} />
       <Jacaranda x={4.7} z={0.5} />
       <GothicHall position={[0, 0, -7]} />
-      <House position={[-7.2, 0, 3.8]} color="#453b32" />
-      <House position={[7.2, 0, 4.2]} color="#453b32" />
-      <ModernLab position={[7.4, 0, -4.5]} />
+      <Classroom
+        position={[-7.4, 0, 4.2]}
+        label="AI 安全与对齐教室"
+        color="#f1c875"
+      />
+      <Classroom
+        position={[7.2, 0, 4.5]}
+        label="智能合约研讨教室"
+        color="#8fd7ff"
+      />
+      <House position={[0, 0, 7.8]} color="#49675c" research />
+      <ModernLab position={[7.4, 0, -4.5]} glow="#8de7df" />
+      <ResearchDome
+        position={[-7.6, 0, -4.5]}
+        label="Web3 协议实验室"
+        color="#b59aff"
+      />
+      <ResearchDome
+        position={[-9.5, 0, 1]}
+        label="隐私计算实验室"
+        color="#7ee0ad"
+      />
+      <ResearchDome
+        position={[9.5, 0, 0.8]}
+        label="具身智能实验室"
+        color="#ff9b71"
+      />
       {Array.from({ length: completed }, (_, index) => (
         <GrowthBuilding
           key={`growth-${index}`}
@@ -822,7 +941,7 @@ function Scene({
       ))}
       <WorldLabel position={[0, 7.2, -7]}>悉尼大学主楼 · Quadrangle</WorldLabel>
       <WorldLabel position={[7.4, 3.8, -4.5]} color="#9fdced">
-        AI 研究中心
+        生成式 AI 实验室
       </WorldLabel>
       <WorldLabel position={[0, 2.1, 0]} color="#ffe0a3">
         校园草坪 · 公共交流区
@@ -936,13 +1055,13 @@ export default function Home() {
             const action = actions[Math.floor(Math.random() * actions.length)],
               t = TARGETS[Math.floor(Math.random() * TARGETS.length)];
             const thoughts: Record<Action, string> = {
-              探索: "也许那条小路通向新的资源。",
-              采集: "先补足团队最紧缺的材料。",
-              研究: "这些数据之间一定有关联。",
-              建造: "再完成一段结构就更接近目标。",
-              休息: "保持精力才能作出好判断。",
-              交流: "这条信息应该对伙伴有帮助。",
-              工作: "这项日常工作需要完成。",
+              探索: "去另一间实验室看看是否有可复用的数据集。",
+              采集: "先申请团队最紧缺的算力与实验样本。",
+              研究: "模型行为与链上激励之间可能存在因果关系。",
+              建造: "再完成一组设施就能启动跨学科实验。",
+              休息: "暂停训练，整理实验假设与失败记录。",
+              交流: "这组结果应该交给伙伴做交叉验证。",
+              工作: "今天的基准评测与复现实验需要完成。",
             };
             const copy = [...old];
             copy[idx] = {
@@ -956,7 +1075,9 @@ export default function Home() {
                 Math.min(100, cur.energy + (action === "休息" ? 12 : -3)),
               ),
               speech:
-                action === "交流" ? "我有个发现，谁想一起看看？" : undefined,
+                action === "交流"
+                  ? "我有一组 AI × Web3 结果，谁来做同行评审？"
+                  : undefined,
               xp: ((cur.xp || 0) + 4 * speed) % 100,
               level:
                 (cur.level || 1) + ((cur.xp || 0) + 4 * speed >= 100 ? 1 : 0),
@@ -966,10 +1087,12 @@ export default function Home() {
         }
         if (Math.random() < 0.18) {
           const texts = [
-            "凯洛与言川协作完成了一段观测站结构",
-            "米欧在广场同步了各组的资源信息",
-            "林岚记录了一条新的动物迁徙路径",
-            "苏禾把食物送给了体力较低的伙伴",
+            "凯洛与言川完成智能合约安全性与机器人权限的联合测试",
+            "米欧在草坪研讨会同步了科研 DAO 的投票实验",
+            "林岚提出用可解释性方法分析多智能体协作涌现",
+            "苏禾演示了零知识证明如何验证私有训练数据",
+            "诺瓦发现去中心化训练节点出现共识分叉，正在组织复现实验",
+            "团队就 AI 模型署名与链上知识产权产生分歧，信任关系正在调整",
           ];
           addEvent(
             texts[Math.floor(Math.random() * texts.length)],
@@ -985,7 +1108,7 @@ export default function Home() {
             setCompleted((count) => {
               const built = PROJECTS[count % PROJECTS.length];
               addEvent(
-                `${built.name}完工，聚落规模与生产能力获得提升`,
+                `${built.name}完工，新课程与跨实验室科研项目现已开放`,
                 "world",
                 next,
               );
@@ -995,7 +1118,7 @@ export default function Home() {
               old.map((person) => ({
                 ...person,
                 xp: Math.min(99, (person.xp || 0) + 12),
-                memory: ["团队完成了新的聚落建设", ...person.memory].slice(
+                memory: ["团队共同完成了新的科研设施", ...person.memory].slice(
                   0,
                   3,
                 ),
@@ -1069,11 +1192,11 @@ export default function Home() {
       </header>
       <section className="metric-strip" aria-label="世界指标">
         {[
-          ["居民人口", agents.length, "6 位活跃居民"],
-          ["食物储备", 82, "今日净增 +4.5"],
-          ["知识总量", Math.round(knowledge), "研究持续积累"],
-          ["聚落幸福度", 68, "关系与需求综合"],
-          ["社会凝聚力", 57, "信任网络稳定"],
+          ["研究成员", agents.length, "6 位 AI × Web3 学者"],
+          ["共享算力", 82, "训练额度持续恢复"],
+          ["科研知识", Math.round(knowledge), "实验结论持续积累"],
+          ["复现可信度", 68, "证据与同行评审综合"],
+          ["团队信任度", 57, "合作关系动态演化"],
         ].map(([label, value, note], index) => (
           <article className="metric-card" key={String(label)}>
             <span>{label}</span>
@@ -1099,7 +1222,7 @@ export default function Home() {
             <small>ACTIONS</small>
           </div>
           <p className="rail-copy">
-            观察校园、配置研究建设，并查看 AI 居民此刻的协作。
+            观察 AI × Web3 学术社区，跟踪实验、课程、争论与跨学科协作。
           </p>
           <div className="people-panel">
             <div className="dock-title">
@@ -1146,13 +1269,13 @@ export default function Home() {
             </div>
             <div className="resources">
               <span>
-                木材 <b>{Math.round(wood)}</b>
+                算力 <b>{Math.round(wood)}</b>
               </span>
               <span>
                 知识 <b>{Math.round(knowledge)}</b>
               </span>
               <span>
-                食物 <b>82</b>
+                数据 <b>82</b>
               </span>
             </div>
           </div>
