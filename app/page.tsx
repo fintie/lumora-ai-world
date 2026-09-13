@@ -254,6 +254,17 @@ const PROJECTS = [
   },
 ];
 
+const RESEARCH_TOPICS = [
+  "多智能体协作是否能用链上信誉降低幻觉传播",
+  "零知识证明如何验证模型训练过程而不泄露数据",
+  "科研 DAO 的二次方投票能否避免少数节点垄断",
+  "具身智能实验数据应该如何确权与开放复现",
+  "去中心化推理网络怎样权衡延迟、成本与可信度",
+  "智能合约代理在自主执行前需要哪些安全边界",
+  "链上知识图谱能否追踪论文结论的证据来源",
+  "联邦学习与可验证计算如何组合成可信实验管线",
+];
+
 function expansionPosition(index: number): [number, number, number] {
   const slotsPerRing = 10;
   const ring = Math.floor(index / slotsPerRing);
@@ -468,6 +479,124 @@ function ModernLab({
         distance={7}
       />
     </group>
+  );
+}
+
+function CampusBuilding({
+  position,
+  size,
+  label,
+  color = "#776451",
+  glow = "#ffd27b",
+}: {
+  position: [number, number, number];
+  size: [number, number, number];
+  label: string;
+  color?: string;
+  glow?: string;
+}) {
+  const windows = Math.max(3, Math.floor(size[0] / 1.2));
+  return (
+    <group position={position}>
+      <RoundedBox
+        args={size}
+        radius={0.12}
+        smoothness={4}
+        position={[0, size[1] / 2, 0]}
+        castShadow
+      >
+        <meshStandardMaterial color={color} roughness={0.82} />
+      </RoundedBox>
+      {Array.from({ length: windows }, (_, i) => {
+        const x = -size[0] / 2 + ((i + 1) * size[0]) / (windows + 1);
+        return (
+          <mesh key={i} position={[x, size[1] * 0.56, size[2] / 2 + 0.02]}>
+            <boxGeometry args={[0.5, 0.48, 0.06]} />
+            <meshStandardMaterial
+              color={glow}
+              emissive={glow}
+              emissiveIntensity={1.4}
+            />
+          </mesh>
+        );
+      })}
+      <WorldLabel position={[0, size[1] + 0.9, 0]} color={glow}>
+        {label}
+      </WorldLabel>
+    </group>
+  );
+}
+
+function CampusDetails() {
+  return (
+    <>
+      <CampusBuilding
+        position={[-13.5, 0, -7]}
+        size={[5.4, 2.5, 3]}
+        label="Fisher Library"
+        color="#615e59"
+        glow="#9ed7ff"
+      />
+      <CampusBuilding
+        position={[-13.2, 0, -1.8]}
+        size={[4.7, 3.1, 3.2]}
+        label="Chau Chak Wing Museum"
+        color="#8c735d"
+        glow="#f0c98b"
+      />
+      <CampusBuilding
+        position={[13.4, 0, -7]}
+        size={[5.8, 2.8, 3]}
+        label="New Law Building"
+        color="#4d5c5d"
+        glow="#b5e0df"
+      />
+      <CampusBuilding
+        position={[13.5, 0, -1.8]}
+        size={[5.1, 2.5, 3]}
+        label="Carslaw Building"
+        color="#6a5547"
+        glow="#e6b779"
+      />
+      <CampusBuilding
+        position={[-12.5, 0, 6.7]}
+        size={[5.8, 2.4, 3.1]}
+        label="Wentworth Building"
+        color="#59615c"
+        glow="#a7d9c2"
+      />
+      <CampusBuilding
+        position={[12.7, 0, 7]}
+        size={[6.2, 2.8, 3.2]}
+        label="Engineering Precinct"
+        color="#4c555b"
+        glow="#9bbcff"
+      />
+      <CampusBuilding
+        position={[0, 0, 13.7]}
+        size={[6.4, 2.1, 2.8]}
+        label="Abercrombie Business School"
+        color="#745c49"
+        glow="#f2c982"
+      />
+      <mesh position={[-13.5, 0.035, 12]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[3.8, 40]} />
+        <meshStandardMaterial color="#365c39" roughness={1} />
+      </mesh>
+      <WorldLabel position={[-13.5, 0.8, 12]} color="#b8e58e">
+        University Oval
+      </WorldLabel>
+      <mesh position={[13, 0.03, 12]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[3.3, 40]} />
+        <meshStandardMaterial color="#234632" roughness={1} />
+      </mesh>
+      <WorldLabel position={[13, 0.8, 12]} color="#c5efb0">
+        Victoria Park
+      </WorldLabel>
+      <WorldLabel position={[0, 0.75, 17]} color="#f1c98c">
+        University Avenue · City Road
+      </WorldLabel>
+    </>
   );
 }
 
@@ -814,6 +943,7 @@ function Scene({
   follow,
   progress,
   completed,
+  minute,
 }: {
   agents: Agent[];
   selected: string;
@@ -823,7 +953,21 @@ function Scene({
   follow: string | null;
   progress: number;
   completed: number;
+  minute: number;
 }) {
+  const sunPhase = (minute / 1440) * Math.PI * 2 - Math.PI / 2;
+  const daylight = THREE.MathUtils.clamp(Math.sin(sunPhase), 0, 1);
+  const sky = new THREE.Color("#050914")
+    .lerp(new THREE.Color("#8ab6c6"), daylight * 0.72)
+    .getStyle();
+  const fog = new THREE.Color("#07100f")
+    .lerp(new THREE.Color("#9eb9ad"), daylight * 0.55)
+    .getStyle();
+  const sunPosition: [number, number, number] = [
+    Math.cos(sunPhase) * 18,
+    Math.sin(sunPhase) * 18,
+    -8,
+  ];
   const trees = useMemo(
     () => [
       [-10, -8, 1.2],
@@ -848,20 +992,48 @@ function Scene({
   );
   return (
     <>
-      <color attach="background" args={["#07130f"]} />
-      <fog attach="fog" args={["#081710", 15, 38]} />
-      <ambientLight intensity={0.3} color="#6f8c79" />
+      <color attach="background" args={[sky]} />
+      <fog attach="fog" args={[fog, 20, 48]} />
+      <ambientLight
+        intensity={0.18 + daylight * 0.72}
+        color={daylight > 0.2 ? "#d8e5d6" : "#6378a0"}
+      />
       <directionalLight
-        position={[10, 14, 6]}
-        intensity={1.15}
-        color="#e5b76c"
+        position={sunPosition}
+        intensity={0.12 + daylight * 1.65}
+        color={daylight > 0.2 ? "#ffe1a2" : "#8097c9"}
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
-      <Stars radius={50} depth={20} count={500} factor={1.5} fade />
+      {daylight < 0.28 && (
+        <Stars radius={50} depth={20} count={700} factor={1.7} fade />
+      )}
+      <mesh position={sunPosition}>
+        <sphereGeometry args={[0.75, 18, 18]} />
+        <meshBasicMaterial color={daylight > 0 ? "#fff0ae" : "#c8d6ff"} />
+      </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[18, 64]} />
-        <meshStandardMaterial color="#1d3524" roughness={1} />
+        <circleGeometry args={[22, 64]} />
+        <meshStandardMaterial
+          color={daylight > 0.15 ? "#294b31" : "#142b20"}
+          roughness={1}
+        />
+      </mesh>
+      <mesh
+        position={[0, 0.01, 15.8]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[27, 1.6]} />
+        <meshStandardMaterial color="#5f5e5b" roughness={0.95} />
+      </mesh>
+      <mesh
+        position={[0, 0.012, 11]}
+        rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+        receiveShadow
+      >
+        <planeGeometry args={[1.2, 31]} />
+        <meshStandardMaterial color="#756851" roughness={0.95} />
       </mesh>
       <mesh
         position={[0, 0.02, -1.3]}
@@ -905,6 +1077,7 @@ function Scene({
       <Jacaranda x={-4.6} z={0.8} />
       <Jacaranda x={4.7} z={0.5} />
       <GothicHall position={[0, 0, -7]} />
+      <CampusDetails />
       <Classroom
         position={[-7.4, 0, 4.2]}
         label="AI 安全与对齐教室"
@@ -1002,11 +1175,14 @@ function Scene({
         makeDefault
         enableDamping
         minDistance={5}
-        maxDistance={35}
+        maxDistance={45}
         maxPolarAngle={Math.PI / 2.1}
         target={[0, 1, 0]}
       />
-      <Environment preset="forest" environmentIntensity={0.12} />
+      <Environment
+        preset="forest"
+        environmentIntensity={0.08 + daylight * 0.14}
+      />
     </>
   );
 }
@@ -1027,6 +1203,16 @@ export default function Home() {
   const [follow, setFollow] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const agent = agents.find((a) => a.id === selected) || agents[0];
+  const dayPhase =
+    minute < 300
+      ? "深夜"
+      : minute < 420
+        ? "日出"
+        : minute < 1020
+          ? "白昼"
+          : minute < 1140
+            ? "黄昏"
+            : "夜晚";
   const addEvent = useCallback(
     (text: string, kind: EventItem["kind"], time: number) =>
       setEvents((e) =>
@@ -1085,20 +1271,66 @@ export default function Home() {
             return copy;
           });
         }
-        if (Math.random() < 0.18) {
-          const texts = [
-            "凯洛与言川完成智能合约安全性与机器人权限的联合测试",
-            "米欧在草坪研讨会同步了科研 DAO 的投票实验",
-            "林岚提出用可解释性方法分析多智能体协作涌现",
-            "苏禾演示了零知识证明如何验证私有训练数据",
-            "诺瓦发现去中心化训练节点出现共识分叉，正在组织复现实验",
-            "团队就 AI 模型署名与链上知识产权产生分歧，信任关系正在调整",
-          ];
-          addEvent(
-            texts[Math.floor(Math.random() * texts.length)],
-            Math.random() > 0.5 ? "work" : "talk",
-            next,
-          );
+        if (Math.random() < 0.22) {
+          setAgents((old) => {
+            const first = Math.floor(Math.random() * old.length);
+            let second = Math.floor(Math.random() * old.length);
+            if (second === first) second = (second + 1) % old.length;
+            const a = old[first];
+            const b = old[second];
+            const topic =
+              RESEARCH_TOPICS[
+                (Math.floor(next / 10) + first * 3 + second) %
+                  RESEARCH_TOPICS.length
+              ];
+            const trust = a.relations[b.id] ?? 50;
+            const conflict = trust < 50 || Math.random() < 0.18;
+            const outcome = conflict
+              ? `${a.name}质疑${b.name}的实验假设，双方决定增加对照组`
+              : `${a.name}与${b.name}形成新共识，并约定共享复现实验结果`;
+            const memory = `${formatTime(next)} 与${b.name}讨论：${topic}`;
+            const delta = conflict ? -2 : 3;
+            const meeting: [number, number, number] = [
+              TARGETS[(first + second) % TARGETS.length][0],
+              0,
+              TARGETS[(first + second) % TARGETS.length][2],
+            ];
+            addEvent(`${outcome}｜${topic}`, "talk", next);
+            return old.map((person, index) => {
+              if (index !== first && index !== second) return person;
+              const partner = index === first ? b : a;
+              return {
+                ...person,
+                action: "交流",
+                target:
+                  index === first
+                    ? meeting
+                    : ([meeting[0] + 0.8, 0, meeting[2] + 0.6] as [
+                        number,
+                        number,
+                        number,
+                      ]),
+                speech:
+                  index === first
+                    ? `我的假设：${topic}`
+                    : conflict
+                      ? "我不同意，先补一组可复现实验。"
+                      : "同意，我来设计验证指标。",
+                thought: `${partner.role}的视角正在改变我的研究判断。`,
+                reason: `近期记忆、共同目标与对${partner.name}的信任共同触发了讨论`,
+                memory: [memory, ...person.memory].slice(0, 4),
+                relations: {
+                  ...person.relations,
+                  [partner.id]: Math.max(
+                    10,
+                    Math.min(100, (person.relations[partner.id] ?? 50) + delta),
+                  ),
+                },
+                social: Math.min(100, person.social + 2),
+                xp: Math.min(99, (person.xp || 0) + 5),
+              };
+            });
+          });
         }
         setWood((v) => Math.min(100, v + 0.22 * speed));
         setKnowledge((v) => Math.min(100, v + 0.18 * speed));
@@ -1175,7 +1407,9 @@ export default function Home() {
           <span className={paused ? "dot paused" : "dot"} />
           <b>{paused ? "世界已暂停" : "世界运行中"}</b>
           <span>第 12 天 · {formatTime(minute)}</span>
-          <span className="weather">☀ 18°C</span>
+          <span className="weather">
+            {minute >= 420 && minute < 1080 ? "☀" : "☾"} {dayPhase} · 18°C
+          </span>
         </div>
         <div className="header-actions">
           <button className="icon-button" onClick={save} title="保存世界">
@@ -1295,6 +1529,7 @@ export default function Home() {
               follow={follow}
               progress={progress}
               completed={completed}
+              minute={minute}
             />
           </Canvas>
           <div className="scene-title">
@@ -1461,7 +1696,7 @@ export default function Home() {
         <span>
           <span className="dot" /> RULE ENGINE · LOCAL
         </span>
-        <span>决策循环：观察 → 思考 → 行动 → 记忆</span>
+        <span>科研循环：观察 → 假设 → 讨论 → 实验 → 记忆迭代</span>
         <span>
           <FastForward size={13} /> {speed}× 模拟速度
         </span>
