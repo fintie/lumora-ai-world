@@ -218,32 +218,32 @@ const TARGETS: [number, number, number][] = [
 ];
 const PROJECTS = [
   {
-    name: "森林观测站",
+    name: "AI 研究中心",
     pos: [2.8, 0, -2] as [number, number, number],
     color: "#678c75",
   },
   {
-    name: "溪谷工坊",
+    name: "工程创新工坊",
     pos: [-2.5, 0, -6] as [number, number, number],
     color: "#a66f4c",
   },
   {
-    name: "社区温室",
+    name: "校园生态温室",
     pos: [-8, 0, 0] as [number, number, number],
     color: "#72a88c",
   },
   {
-    name: "太阳能塔",
+    name: "可持续能源塔",
     pos: [8, 0, 0] as [number, number, number],
     color: "#d1a34f",
   },
   {
-    name: "记忆图书馆",
+    name: "数字知识馆",
     pos: [2, 0, 7] as [number, number, number],
     color: "#7289a9",
   },
   {
-    name: "河畔医务所",
+    name: "校园健康中心",
     pos: [-5, 0, -5] as [number, number, number],
     color: "#c47c78",
   },
@@ -272,6 +272,32 @@ function Tree({ x, z, s = 1 }: { x: number; z: number; s?: number }) {
         <coneGeometry args={[0.75, 1.6, 8]} />
         <meshStandardMaterial color="#28583a" roughness={0.95} />
       </mesh>
+    </group>
+  );
+}
+function Jacaranda({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 1.1, 0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.28, 2.2, 7]} />
+        <meshStandardMaterial color="#3d2b24" />
+      </mesh>
+      {[
+        [0, 2.25, 0],
+        [-0.55, 2.05, 0.15],
+        [0.55, 2.1, -0.1],
+        [0.1, 2.65, 0.1],
+      ].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]} castShadow>
+          <dodecahedronGeometry args={[0.72, 0]} />
+          <meshStandardMaterial
+            color="#684a87"
+            emissive="#3b2752"
+            emissiveIntensity={0.25}
+            roughness={0.9}
+          />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -320,6 +346,115 @@ function House({
         color="#ffae55"
         intensity={2.2}
         distance={5}
+      />
+    </group>
+  );
+}
+
+function GothicHall({ position = [0, 0, -5] as [number, number, number] }) {
+  const sandstone = "#9b7048";
+  const warm = "#ffc45d";
+  return (
+    <group position={position}>
+      <mesh position={[0, 1.35, 0]} castShadow receiveShadow>
+        <boxGeometry args={[9.4, 2.7, 1.45]} />
+        <meshStandardMaterial color={sandstone} roughness={0.92} />
+      </mesh>
+      {[-3.9, -2.6, -1.3, 0, 1.3, 2.6, 3.9].map((x) => (
+        <group key={x} position={[x, 1.15, 0.76]}>
+          <mesh>
+            <boxGeometry args={[0.7, 1.35, 0.08]} />
+            <meshStandardMaterial color="#24170f" />
+          </mesh>
+          <mesh position={[0, 0, 0.05]}>
+            <planeGeometry args={[0.42, 0.92]} />
+            <meshStandardMaterial
+              color={warm}
+              emissive="#ff952f"
+              emissiveIntensity={2.4}
+            />
+          </mesh>
+        </group>
+      ))}
+      <mesh position={[0, 3.55, 0]} castShadow>
+        <boxGeometry args={[1.8, 4.4, 1.8]} />
+        <meshStandardMaterial color="#a97d51" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 6.05, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+        <coneGeometry args={[1.5, 1.65, 4]} />
+        <meshStandardMaterial color="#3b342d" metalness={0.35} />
+      </mesh>
+      <mesh position={[0, 4.15, 0.92]}>
+        <circleGeometry args={[0.42, 24]} />
+        <meshStandardMaterial
+          color="#ead7a3"
+          emissive="#d9ad55"
+          emissiveIntensity={1.2}
+        />
+      </mesh>
+      <mesh position={[0, 4.15, 0.96]}>
+        <boxGeometry args={[0.035, 0.28, 0.02]} />
+        <meshBasicMaterial color="#3a2c20" />
+      </mesh>
+      <mesh position={[0.11, 4.06, 0.97]} rotation={[0, 0, -0.8]}>
+        <boxGeometry args={[0.025, 0.22, 0.02]} />
+        <meshBasicMaterial color="#3a2c20" />
+      </mesh>
+      {[-4.45, 4.45].map((x) => (
+        <mesh
+          key={x}
+          position={[x, 3.15, 0]}
+          rotation={[0, Math.PI / 4, 0]}
+          castShadow
+        >
+          <coneGeometry args={[0.72, 1.9, 4]} />
+          <meshStandardMaterial color="#49443a" />
+        </mesh>
+      ))}
+      <pointLight
+        position={[0, 2, 3]}
+        color="#ffad50"
+        intensity={4}
+        distance={11}
+      />
+    </group>
+  );
+}
+
+function ModernLab({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      <RoundedBox
+        args={[4.2, 2.4, 3]}
+        radius={0.16}
+        smoothness={4}
+        position={[0, 1.2, 0]}
+        castShadow
+      >
+        <meshStandardMaterial
+          color="#333d3c"
+          metalness={0.25}
+          roughness={0.4}
+        />
+      </RoundedBox>
+      <mesh position={[0, 1.35, 1.53]}>
+        <planeGeometry args={[3.3, 1.35]} />
+        <meshStandardMaterial
+          color="#8cc5c3"
+          emissive="#4e9fa0"
+          emissiveIntensity={1.1}
+          metalness={0.4}
+        />
+      </mesh>
+      <mesh position={[0, 2.75, 0]} rotation={[0, Math.PI / 4, 0]}>
+        <coneGeometry args={[1.2, 0.7, 16]} />
+        <meshStandardMaterial color="#c59b52" metalness={0.65} />
+      </mesh>
+      <pointLight
+        position={[0, 1.6, 2.5]}
+        color="#8de7df"
+        intensity={2.2}
+        distance={7}
       />
     </group>
   );
@@ -631,7 +766,31 @@ function Scene({
       <Stars radius={50} depth={20} count={500} factor={1.5} fade />
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[18, 64]} />
-        <meshStandardMaterial color="#243e2a" roughness={1} />
+        <meshStandardMaterial color="#1d3524" roughness={1} />
+      </mesh>
+      <mesh
+        position={[0, 0.02, -1.3]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[11, 8]} />
+        <meshStandardMaterial color="#385c36" roughness={1} />
+      </mesh>
+      <mesh
+        position={[0, 0.035, -1.2]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[1.05, 13]} />
+        <meshStandardMaterial color="#8b7354" roughness={0.95} />
+      </mesh>
+      <mesh
+        position={[0, 0.04, -1.2]}
+        rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+        receiveShadow
+      >
+        <planeGeometry args={[0.8, 10.5]} />
+        <meshStandardMaterial color="#7e6a50" roughness={0.95} />
       </mesh>
       <mesh
         position={[0, 0.015, 0]}
@@ -648,9 +807,12 @@ function Scene({
       {trees.map((t, i) => (
         <Tree key={i} x={t[0]} z={t[1]} s={t[2]} />
       ))}
-      <House position={[-6, 0, 3]} color="#bd6f52" />
-      <House position={[5, 0, 4]} color="#618898" />
-      <House position={[6, 0, -5]} research color="#586f85" />
+      <Jacaranda x={-4.6} z={0.8} />
+      <Jacaranda x={4.7} z={0.5} />
+      <GothicHall position={[0, 0, -7]} />
+      <House position={[-7.2, 0, 3.8]} color="#453b32" />
+      <House position={[7.2, 0, 4.2]} color="#453b32" />
+      <ModernLab position={[7.4, 0, -4.5]} />
       {Array.from({ length: completed }, (_, index) => (
         <GrowthBuilding
           key={`growth-${index}`}
@@ -658,12 +820,12 @@ function Scene({
           index={index}
         />
       ))}
-      <WorldLabel position={[-6, 3.3, 3]}>生活区</WorldLabel>
-      <WorldLabel position={[6, 3.3, -5]} color="#9fdced">
-        林地研究站
+      <WorldLabel position={[0, 7.2, -7]}>悉尼大学主楼 · Quadrangle</WorldLabel>
+      <WorldLabel position={[7.4, 3.8, -4.5]} color="#9fdced">
+        AI 研究中心
       </WorldLabel>
       <WorldLabel position={[0, 2.1, 0]} color="#ffe0a3">
-        篝火广场 · 公共区
+        校园草坪 · 公共交流区
       </WorldLabel>
       <group position={[0, 0, 0]}>
         <mesh position={[0, 0.18, 0]}>
@@ -883,7 +1045,7 @@ export default function Home() {
           </span>
           <div>
             <b>LUMORA</b>
-            <small>自主世界实验室</small>
+            <small>悉尼大学 AI 校园实验室</small>
           </div>
         </div>
         <div className="world-status">
@@ -937,7 +1099,7 @@ export default function Home() {
             <small>ACTIONS</small>
           </div>
           <p className="rail-copy">
-            观察社区、配置建设，并查看居民此刻的协作。
+            观察校园、配置研究建设，并查看 AI 居民此刻的协作。
           </p>
           <div className="people-panel">
             <div className="dock-title">
@@ -1013,9 +1175,9 @@ export default function Home() {
             />
           </Canvas>
           <div className="scene-title">
-            <span>晨溪聚落</span>
+            <span>悉尼大学 · Camperdown</span>
             <small>
-              <Eye size={13} /> 全局生态视图
+              <Eye size={13} /> AI 校园实时视图
             </small>
           </div>
           <div className="camera-tools">
