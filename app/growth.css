@@ -3,6 +3,194 @@
   background: linear-gradient(90deg, #f7f0d9, #eef6e9);
 }
 
+/* Smallville-style observation mode: the town is primary, information is on demand. */
+.app-shell {
+  grid-template-rows: 52px 72px minmax(620px, 1fr) 0 26px;
+}
+.metric-strip {
+  padding: 8px 14px;
+}
+.metric-card {
+  padding: 8px 12px;
+}
+.metric-card b {
+  font-size: 19px;
+}
+.metric-card p {
+  margin-top: 3px;
+}
+.workspace {
+  position: relative;
+  display: block;
+  min-height: 620px;
+  padding: 0 14px 10px;
+  overflow: hidden;
+}
+.world-panel {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  min-height: 610px;
+  border-radius: 14px;
+}
+.world-panel::after {
+  background: linear-gradient(180deg, #06100b20, transparent 25%, #02060420);
+}
+.town-ui-tools {
+  position: absolute;
+  z-index: 8;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid #405347;
+  border-radius: 10px;
+  background: #0c1712d9;
+  backdrop-filter: blur(12px);
+}
+.town-ui-tools button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #c6c7bb;
+  font-size: 10px;
+  cursor: pointer;
+}
+.town-ui-tools button:hover,
+.town-ui-tools button.active {
+  border-color: #b9944d;
+  background: #3a301d;
+  color: #f0d28d;
+}
+.town-drawer {
+  position: absolute !important;
+  z-index: 7;
+  top: 58px;
+  bottom: 20px;
+  width: min(320px, calc(100% - 32px));
+  max-height: calc(100% - 78px);
+  margin: 0;
+  overflow-y: auto !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease,
+    visibility 180ms;
+  backdrop-filter: blur(15px);
+}
+.town-drawer.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.roster-drawer {
+  left: 26px;
+  transform: translateX(-18px);
+}
+.roster-drawer.open {
+  transform: translateX(0);
+}
+.inspector-drawer {
+  right: 26px;
+  transform: translateX(18px);
+}
+.inspector-drawer.open {
+  transform: translateX(0);
+}
+.town-events {
+  display: none;
+  position: fixed;
+  z-index: 30;
+  right: 18px;
+  bottom: 34px;
+  left: 18px;
+  max-height: 180px;
+  overflow: auto;
+}
+.town-events.open {
+  display: block;
+}
+.world-label {
+  padding: 3px 6px;
+  border-width: 1px;
+  background: #0a120ea8;
+  font-size: 7px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px #0005;
+}
+.agent-bubble {
+  width: 128px;
+  padding: 5px 7px;
+  border-radius: 7px;
+}
+.agent-bubble span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-rows: auto;
+  }
+  .metric-strip {
+    padding: 7px 10px;
+  }
+  .workspace {
+    display: block;
+    min-height: 68svh;
+    padding: 0 8px 8px;
+  }
+  .world-panel {
+    height: 68svh;
+    min-height: 500px;
+    max-height: none;
+  }
+  .town-ui-tools {
+    top: 8px;
+    right: 8px;
+  }
+  .town-ui-tools button {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .town-drawer {
+    position: fixed !important;
+    z-index: 40;
+    top: auto;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: auto;
+    max-height: 62svh;
+    transform: translateY(18px);
+  }
+  .town-drawer.open {
+    transform: translateY(0);
+  }
+  .town-events {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    max-height: 45svh;
+  }
+  .agent-bubble {
+    width: 104px;
+  }
+}
+
 .growth-stat em {
   background: linear-gradient(90deg, #d5a749, #65a97e);
 }
@@ -631,5 +819,65 @@ footer {
   }
   .world-panel {
     min-height: 400px;
+  }
+}
+
+/* Final observation-mode overrides */
+.app-shell {
+  grid-template-rows: 52px 72px minmax(620px, 1fr) 0 26px;
+}
+.workspace {
+  position: relative;
+  display: block;
+  min-height: 620px;
+  padding: 0 14px 10px;
+  overflow: hidden;
+}
+.world-panel {
+  position: relative;
+  top: auto;
+  width: 100%;
+  height: 100%;
+  min-height: 610px;
+}
+.town-events {
+  display: none;
+}
+.town-events.open {
+  display: block;
+}
+.world-label {
+  padding: 3px 6px;
+  background: #0a120ea8;
+  font-size: 7px;
+  box-shadow: 0 2px 8px #0005;
+}
+
+@media (max-width: 760px) {
+  .workspace {
+    display: block;
+    min-height: 68svh;
+    padding: 0 8px 8px;
+  }
+  .world-panel {
+    height: 68svh;
+    min-height: 500px;
+    max-height: none;
+  }
+  .town-drawer {
+    position: fixed !important;
+    top: auto;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: auto;
+    max-height: 62svh;
+  }
+  .town-events {
+    position: fixed;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    max-height: 45svh;
   }
 }
