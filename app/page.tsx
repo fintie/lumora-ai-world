@@ -991,17 +991,19 @@ function Avatar({
           <meshStandardMaterial color="#11191c" />
         </RoundedBox>
       </group>
-      <Billboard position={[0, 2.5, 0]}>
-        <Html center>
-          <div className="agent-bubble">
-            <strong>
-              {agent.name} · Lv.{agent.level || 1}
-            </strong>
-            <span>{agent.speech || agent.thought}</span>
-            <i>{agent.action}</i>
-          </div>
-        </Html>
-      </Billboard>
+      {(selected || agent.action === "交流") && (
+        <Billboard position={[0, 2.5, 0]}>
+          <Html center>
+            <div className="agent-bubble">
+              <strong>
+                {agent.name} · Lv.{agent.level || 1}
+              </strong>
+              <span>{agent.speech || agent.thought}</span>
+              <i>{agent.action}</i>
+            </div>
+          </Html>
+        </Billboard>
+      )}
     </group>
   );
 }
@@ -1265,7 +1267,8 @@ function Scene({
         enableDamping
         minDistance={5}
         maxDistance={45}
-        maxPolarAngle={Math.PI / 2.1}
+        minPolarAngle={0.55}
+        maxPolarAngle={1.18}
         target={[0, 1, 0]}
       />
       <Environment
@@ -1291,6 +1294,9 @@ export default function Home() {
   const [events, setEvents] = useState(START_EVENTS);
   const [follow, setFollow] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [showRoster, setShowRoster] = useState(false);
+  const [showInspector, setShowInspector] = useState(false);
+  const [showEvents, setShowEvents] = useState(false);
   const agent = agents.find((a) => a.id === selected) || agents[0];
   const dayPhase =
     minute < 300
@@ -1539,7 +1545,9 @@ export default function Home() {
         ))}
       </section>
       <section className="workspace">
-        <aside className="left-rail">
+        <aside
+          className={`left-rail town-drawer roster-drawer ${showRoster ? "open" : ""}`}
+        >
           <div className="rail-heading">
             <span>改变世界</span>
             <small>ACTIONS</small>
@@ -1558,7 +1566,10 @@ export default function Home() {
               {agents.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => setSelected(a.id)}
+                  onClick={() => {
+                    setSelected(a.id);
+                    setShowInspector(true);
+                  }}
                   className={selected === a.id ? "selected" : ""}
                 >
                   <span className="mini-avatar" style={{ background: a.color }}>
@@ -1606,13 +1617,17 @@ export default function Home() {
         <div className="world-panel">
           <Canvas
             shadows
-            camera={{ position: [15, 14, 18], fov: 43 }}
+            camera={{ position: [16, 26, 20], fov: 38 }}
             dpr={[1, 1.6]}
           >
             <Scene
               agents={agents}
               selected={selected}
-              onSelect={setSelected}
+              onSelect={(id) => {
+                setSelected(id);
+                setShowInspector(true);
+                setShowRoster(false);
+              }}
               paused={paused}
               speed={speed}
               follow={follow}
@@ -1621,6 +1636,35 @@ export default function Home() {
               minute={minute}
             />
           </Canvas>
+          <div className="town-ui-tools" aria-label="小镇界面面板">
+            <button
+              className={showRoster ? "active" : ""}
+              onClick={() => {
+                setShowRoster((value) => !value);
+                setShowInspector(false);
+              }}
+              aria-pressed={showRoster}
+            >
+              <Users size={15} /> 人物
+            </button>
+            <button
+              className={showInspector ? "active" : ""}
+              onClick={() => {
+                setShowInspector((value) => !value);
+                setShowRoster(false);
+              }}
+              aria-pressed={showInspector}
+            >
+              <BrainCircuit size={15} /> 详情
+            </button>
+            <button
+              className={showEvents ? "active" : ""}
+              onClick={() => setShowEvents((value) => !value)}
+              aria-pressed={showEvents}
+            >
+              <MessageCircle size={15} /> 事件
+            </button>
+          </div>
           <div className="scene-title">
             <span>悉尼大学 · Camperdown</span>
             <small>
@@ -1657,7 +1701,9 @@ export default function Home() {
           </div>
           {saved && <div className="toast">世界状态已保存到此设备</div>}
         </div>
-        <aside className="inspector">
+        <aside
+          className={`inspector town-drawer inspector-drawer ${showInspector ? "open" : ""}`}
+        >
           <div className="section-heading">
             <div>
               <small>已选择角色</small>
@@ -1762,7 +1808,9 @@ export default function Home() {
           </button>
         </aside>
       </section>
-      <section className="bottom-dock">
+      <section
+        className={`bottom-dock town-events ${showEvents ? "open" : ""}`}
+      >
         <div className="event-panel">
           <div className="dock-title">
             <span>
