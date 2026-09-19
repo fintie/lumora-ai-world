@@ -28,7 +28,8 @@ import {
   Users,
 } from "lucide-react";
 
-type Action = "探索" | "采集" | "研究" | "建造" | "休息" | "交流" | "工作";
+type Action =
+  "Explore" | "Gather" | "Research" | "Build" | "Rest" | "Discuss" | "Work";
 type Agent = {
   id: string;
   name: string;
@@ -71,201 +72,236 @@ const PEOPLE: Agent[] = [
   {
     id: "karina",
     name: "Karina",
-    role: "系统化交易研究员",
+    role: "Systematic Trading Researcher",
     color: "#ff8d5c",
     accent: "#ffd3bd",
-    personality: "直接、技术导向、重视高质量数据与执行效率",
-    goal: "建立由优质数据驱动的 AI 研究与交易系统",
-    skills: ["量化研究", "数据策略"],
-    action: "研究",
-    thought: "模型优势必须来自数据、执行与真实市场约束。",
-    reason: "发现研究假设缺乏高质量数据支持",
-    memory: ["B 建议用完整节点验证链上价量数据"],
+    personality:
+      "Direct, technical, and focused on high-quality data and execution",
+    goal: "Build AI research and trading systems powered by reliable data",
+    skills: ["Quant Research", "Data Strategy"],
+    action: "Research",
+    thought:
+      "A model's edge must survive data, execution, and real market constraints.",
+    reason: "The current hypothesis lacks high-quality supporting data",
+    memory: [
+      "B suggested validating on-chain price and volume with a full node",
+    ],
     energy: 88,
     social: 78,
     pos: [-7, 0, -3],
     target: [7, 0, -5],
-    speech: "先把数据质量和交易成本算清楚。",
+    speech: "Let's quantify data quality and trading costs first.",
     relations: { b: 82, lecky: 72, fan: 64, alu: 48 },
   },
   {
     id: "b",
     name: "B",
-    role: "Web3 基础设施工程师",
+    role: "Web3 Infrastructure Engineer",
     color: "#f8c44f",
     accent: "#fff0ae",
-    personality: "务实、工程化、愿意为完整数据投入基础设施",
-    goal: "运行可信全节点并建设可验证的数据管线",
-    skills: ["全节点", "链上数据"],
-    action: "建造",
-    thought: "没有完整价量数据，任何策略结论都不够扎实。",
-    reason: "研究团队需要可验证的一手链上数据",
-    memory: ["Karina 强调优质数据是系统优势的起点"],
+    personality:
+      "Pragmatic, engineering-minded, and willing to invest in data infrastructure",
+    goal: "Run trusted full nodes and build verifiable data pipelines",
+    skills: ["Full Nodes", "On-chain Data"],
+    action: "Build",
+    thought:
+      "Without complete price and volume data, no strategy conclusion is robust.",
+    reason: "The team needs verifiable first-party on-chain data",
+    memory: [
+      "Karina stressed that quality data is the foundation of systematic edge",
+    ],
     energy: 76,
     social: 68,
     pos: [5, 0, 5],
     target: [8, 0, 1],
-    speech: "我先把节点和数据索引跑起来。",
+    speech: "I'll bring the node and data index online first.",
     relations: { karina: 82, lecky: 66, rc: 71, vincent: 63 },
   },
   {
     id: "fan",
-    name: "饭叔 Fan",
-    role: "AI Agency 与社会研究者",
+    name: "Fan",
+    role: "AI Agency & Society Researcher",
     color: "#76d49b",
     accent: "#c9f5d7",
-    personality: "思辨、重视真实关系、关注技术的社会后果",
-    goal: "研究 AI 代理如何建立长期信任与公共价值",
-    skills: ["AI Agency", "社会分析"],
-    action: "交流",
-    thought: "数字关系可以模拟情绪，但物理互动仍提供独特价值。",
-    reason: "团队争论正在从技术问题延伸到社会影响",
-    memory: ["Nick 提出让 AI 判断成员何时需要帮助"],
+    personality:
+      "Reflective, relationship-focused, and alert to technology's social consequences",
+    goal: "Study how AI agents can build long-term trust and public value",
+    skills: ["AI Agency", "Social Analysis"],
+    action: "Discuss",
+    thought:
+      "Digital relationships can simulate emotion, but physical interaction adds unique value.",
+    reason: "The team's technical debate now has broader social implications",
+    memory: ["Nick proposed that AI identify when community members need help"],
     energy: 73,
     social: 91,
     pos: [-4, 0, 5],
     target: [0, 0, 0],
-    speech: "技术之外，我们还要讨论信任如何形成。",
+    speech: "Beyond technology, we need to understand how trust forms.",
     relations: { nick: 84, meisha: 76, karina: 64, tianbao: 62 },
   },
   {
     id: "lecky",
     name: "Lecky · FluxLayer",
-    role: "市场信号研究员",
+    role: "Market Signal Researcher",
     color: "#6aa8ff",
     accent: "#c8ddff",
-    personality: "敏锐、实验派、同时警惕把相关性误认为因果",
-    goal: "融合市场、社区和影响力数据寻找稳健信号",
-    skills: ["数据分析", "市场情绪"],
-    action: "研究",
-    thought: "数据只能辅助判断，策略不能完全依赖单一信号。",
-    reason: "不同市场状态下同一因子的表现出现分化",
-    memory: ["阿鲁提醒反身性会快速改变加密市场结构"],
+    personality:
+      "Sharp and experimental, but careful not to confuse correlation with causation",
+    goal: "Combine market, community, and influence data into robust signals",
+    skills: ["Data Analysis", "Market Sentiment"],
+    action: "Research",
+    thought:
+      "Data can support judgment, but no strategy should depend on one signal.",
+    reason: "The same factor behaves differently across market regimes",
+    memory: ["A Lu noted that reflexivity can rapidly reshape crypto markets"],
     energy: 79,
     social: 74,
     pos: [3, 0, -5],
     target: [-1, 0, 7],
-    speech: "先分辨信号、市场状态和运气。",
+    speech: "First separate signal, market regime, and luck.",
     relations: { karina: 72, alu: 79, b: 66, tianbao: 58 },
   },
   {
     id: "alu",
-    name: "阿鲁",
-    role: "加密市场实验员",
+    name: "A Lu",
+    role: "Crypto Market Experimenter",
     color: "#bf8cff",
     accent: "#e7d0ff",
-    personality: "幽默、反应快、善于捕捉反身性和社区热点",
-    goal: "理解 Meme、流动性与群体行为之间的反馈循环",
-    skills: ["加密市场", "反身性"],
-    action: "探索",
-    thought: "市场叙事正在反过来塑造参与者的行为。",
-    reason: "社区情绪出现异常聚集，需要快速观察",
-    memory: ["Lecky 建议同时观察长期数据和当前市场状态"],
+    personality:
+      "Witty, quick-reacting, and skilled at spotting reflexivity and community trends",
+    goal: "Understand feedback loops among memes, liquidity, and crowd behavior",
+    skills: ["Crypto Markets", "Reflexivity"],
+    action: "Explore",
+    thought: "The market narrative is now reshaping participant behavior.",
+    reason: "Community sentiment is clustering unusually and needs observation",
+    memory: [
+      "Lecky suggested comparing long-term data with the current regime",
+    ],
     energy: 91,
     social: 88,
     pos: [0, 0, 6],
     target: [-1, 0, 1],
-    speech: "叙事起来了，但先别把运气当能力。",
+    speech: "The narrative is moving, but don't mistake luck for skill.",
     relations: { lecky: 79, karina: 48, tianbao: 75, b: 57 },
   },
   {
     id: "tianbao",
-    name: "天宝",
-    role: "行为与风险研究员",
+    name: "Tianbao",
+    role: "Behavior & Risk Researcher",
     color: "#ff6d91",
     accent: "#ffc6d3",
-    personality: "坦率、善于观察群体心理、对投机风险高度敏感",
-    goal: "建立识别群体狂热与风险扩散的行为模型",
-    skills: ["行为金融", "风险识别"],
-    action: "研究",
-    thought: "快速致富预期正在压缩人们的风险判断时间。",
-    reason: "群体行为指标偏离长期均值",
-    memory: ["阿鲁观察到 Meme 市场情绪再次快速升温"],
+    personality:
+      "Candid, observant of crowd psychology, and highly sensitive to speculative risk",
+    goal: "Model crowd mania and the spread of financial risk",
+    skills: ["Behavioral Finance", "Risk Detection"],
+    action: "Research",
+    thought:
+      "Get-rich-quick expectations are compressing people's risk-assessment horizon.",
+    reason: "Crowd behavior indicators have deviated from long-run norms",
+    memory: ["A Lu observed another rapid rise in meme-market sentiment"],
     energy: 67,
     social: 70,
     pos: [7, 0, -6],
     target: [6, 0, -4],
-    speech: "先检查这是机会，还是群体冲动。",
+    speech: "Let's test whether this is opportunity or crowd impulse.",
     relations: { alu: 75, lecky: 58, fan: 62, karina: 52 },
   },
   {
     id: "rc",
     name: "rc",
-    role: "LLM 全栈工程师",
+    role: "LLM Full-stack Engineer",
     color: "#e36a5d",
     accent: "#ffc1b8",
-    personality: "冷静、实用、关注技术路线与职业持续性",
-    goal: "构建 AI 原生的全栈科研工具链",
-    skills: ["LLM 开发", "FDE"],
-    action: "工作",
-    thought: "最有价值的工程师会把模型能力连接到真实业务。",
-    reason: "团队需要把研究原型转化为可靠系统",
-    memory: ["B 建议强化数学基础与端到端交付能力"],
+    personality: "Calm, practical, and focused on durable technical careers",
+    goal: "Build a full-stack, AI-native research toolchain",
+    skills: ["LLM Development", "FDE"],
+    action: "Work",
+    thought:
+      "The most valuable engineers connect model capability to real operations.",
+    reason:
+      "The team needs to turn research prototypes into dependable systems",
+    memory: [
+      "B recommended stronger mathematics and end-to-end delivery skills",
+    ],
     energy: 82,
     social: 60,
     pos: [10, 0, 4],
     target: [8, 0, 3],
-    speech: "我来把论文原型变成能用的系统。",
+    speech: "I'll turn the paper prototype into a usable system.",
     relations: { b: 71, vincent: 86, nick: 68, meisha: 55 },
   },
   {
     id: "vincent",
     name: "Vincent Lin",
-    role: "AI 原生研发架构师",
+    role: "AI-native R&D Architect",
     color: "#49b9a4",
     accent: "#baf4e8",
-    personality: "前瞻、系统化、相信超级个体与流程重构",
-    goal: "建立由 AI 代理协同驱动的软件研发流程",
-    skills: ["AI SDLC", "智能代理"],
-    action: "建造",
-    thought: "AI 原生研发不是旧流程提速，而是重新设计协作方式。",
-    reason: "现有研发环节仍存在重复交接和信息损耗",
-    memory: ["rc 可以负责把多代理流程接入完整产品栈"],
+    personality:
+      "Forward-looking, systematic, and convinced by agent-enabled super-individuals",
+    goal: "Create an agent-coordinated software development lifecycle",
+    skills: ["AI SDLC", "Agent Systems"],
+    action: "Build",
+    thought:
+      "AI-native development redesigns collaboration rather than merely speeding up old workflows.",
+    reason: "Current development stages still repeat handoffs and lose context",
+    memory: [
+      "rc can integrate the multi-agent workflow into a complete product stack",
+    ],
     energy: 85,
     social: 73,
     pos: [-10, 0, 4],
     target: [-8, 0, 3],
-    speech: "让代理负责流程，让人专注判断。",
+    speech: "Let agents run the workflow so people can focus on judgment.",
     relations: { rc: 86, b: 63, nick: 77, karina: 59 },
   },
   {
     id: "meisha",
-    name: "梅莎 M",
-    role: "教育与公共系统设计者",
+    name: "Meisha M",
+    role: "Education & Public Systems Designer",
     color: "#d49a58",
     accent: "#ffe1ad",
-    personality: "独立、批判性强、关注制度激励与真实体验",
-    goal: "探索 AI 时代更公平有效的教育与学徒制度",
-    skills: ["教育设计", "公共政策"],
-    action: "交流",
-    thought: "教育制度必须让导师和学习者共享长期成果。",
-    reason: "当前培养机制的激励与学生未来并不一致",
-    memory: ["Fan 认为长期物理互动仍有不可替代的价值"],
+    personality:
+      "Independent, critical, and attentive to incentives and lived experience",
+    goal: "Explore fairer education and apprenticeship models for the AI era",
+    skills: ["Education Design", "Public Policy"],
+    action: "Discuss",
+    thought:
+      "Education should let mentors and learners share long-term outcomes.",
+    reason: "Current training incentives are misaligned with students' futures",
+    memory: [
+      "Fan argued that sustained physical interaction remains irreplaceable",
+    ],
     energy: 74,
     social: 83,
     pos: [-9, 0, 7],
     target: [-4, 0, 5],
-    speech: "先重新设计导师与学生的激励关系。",
+    speech:
+      "Let's redesign the incentive relationship between mentors and learners.",
     relations: { fan: 76, nick: 73, rc: 55, vincent: 65 },
   },
   {
     id: "nick",
     name: "Nick Qi",
-    role: "AI 社区与产品设计者",
+    role: "AI Community & Product Designer",
     color: "#718de8",
     accent: "#cad5ff",
-    personality: "连接型、产品导向、关注技术如何帮助真实的人",
-    goal: "建设能主动识别需求并组织互助的 AI 社区",
-    skills: ["产品设计", "社区协作"],
-    action: "探索",
-    thought: "AI 不只回答问题，也应该帮助人们发现彼此能提供的价值。",
-    reason: "成员能力丰富，但协作机会尚未被充分连接",
-    memory: ["Fan 提醒数字互动最终要回到真实信任"],
+    personality:
+      "A connector and product thinker focused on helping real people",
+    goal: "Build an AI community that identifies needs and organizes mutual help",
+    skills: ["Product Design", "Community Building"],
+    action: "Explore",
+    thought:
+      "AI should not only answer questions; it should reveal how people can help one another.",
+    reason:
+      "The community has rich capabilities but too few connected opportunities",
+    memory: [
+      "Fan noted that digital interaction must ultimately produce real trust",
+    ],
     energy: 86,
     social: 94,
     pos: [9, 0, 8],
     target: [0, 0, 0],
-    speech: "我来连接最适合一起解决问题的人。",
+    speech: "I'll connect the people best suited to solve this together.",
     relations: { fan: 84, vincent: 77, meisha: 73, rc: 68 },
   },
 ];
@@ -274,25 +310,25 @@ const START_EVENTS: EventItem[] = [
     id: 1,
     time: "08:14",
     kind: "talk",
-    text: "Karina 与 B 开始验证高质量链上数据的可用性",
+    text: "Karina and B began validating high-quality on-chain data",
   },
   {
     id: 2,
     time: "08:09",
     kind: "work",
-    text: "Vincent Lin 邀请 rc 搭建 AI 原生研发代理流程",
+    text: "Vincent Lin invited rc to build an AI-native agent workflow",
   },
   {
     id: 3,
     time: "07:58",
     kind: "memory",
-    text: "饭叔 Fan 与 Nick Qi 讨论 AI 社区中的长期信任",
+    text: "Fan and Nick Qi discussed long-term trust in AI communities",
   },
   {
     id: 4,
     time: "07:42",
     kind: "world",
-    text: "晨间算力窗口开启，训练资源开始回升",
+    text: "The morning compute window opened and training capacity recovered",
   },
 ];
 const TARGETS: [number, number, number][] = [
@@ -306,52 +342,52 @@ const TARGETS: [number, number, number][] = [
 ];
 const PROJECTS = [
   {
-    name: "多智能体研究中心",
+    name: "Multi-Agent Research Center",
     pos: [2.8, 0, -2] as [number, number, number],
     color: "#678c75",
   },
   {
-    name: "具身智能实验室",
+    name: "Embodied AI Laboratory",
     pos: [-2.5, 0, -6] as [number, number, number],
     color: "#a66f4c",
   },
   {
-    name: "隐私计算实验室",
+    name: "Privacy Computing Lab",
     pos: [-8, 0, 0] as [number, number, number],
     color: "#72a88c",
   },
   {
-    name: "去中心化算力塔",
+    name: "Decentralized Compute Tower",
     pos: [8, 0, 0] as [number, number, number],
     color: "#d1a34f",
   },
   {
-    name: "链上知识图谱馆",
+    name: "On-chain Knowledge Library",
     pos: [2, 0, 7] as [number, number, number],
     color: "#7289a9",
   },
   {
-    name: "AI 安全评测中心",
+    name: "AI Safety Evaluation Center",
     pos: [-5, 0, -5] as [number, number, number],
     color: "#c47c78",
   },
 ];
 
 const RESEARCH_TOPICS = [
-  "多智能体协作是否能用链上信誉降低幻觉传播",
-  "零知识证明如何验证模型训练过程而不泄露数据",
-  "科研 DAO 的二次方投票能否避免少数节点垄断",
-  "具身智能实验数据应该如何确权与开放复现",
-  "去中心化推理网络怎样权衡延迟、成本与可信度",
-  "智能合约代理在自主执行前需要哪些安全边界",
-  "链上知识图谱能否追踪论文结论的证据来源",
-  "联邦学习与可验证计算如何组合成可信实验管线",
-  "高质量链上价量数据能否提高系统化策略的稳健性",
-  "市场情绪、KOL 传播与流动性之间是否存在反馈回路",
-  "AI 原生研发流程如何让超级个体完成端到端交付",
-  "AI 社区怎样识别成员需求并组织可信互助",
-  "学徒制和长期收益共享能否改善教育激励",
-  "数字代理的情绪模拟如何转化为真实世界信任",
+  "Can on-chain reputation reduce hallucination cascades in multi-agent teams?",
+  "How can zero-knowledge proofs verify model training without exposing data?",
+  "Can quadratic voting prevent research DAOs from being captured by a few nodes?",
+  "How should embodied-AI experiment data be owned and openly reproduced?",
+  "How should decentralized inference balance latency, cost, and trust?",
+  "What safety boundaries do smart-contract agents need before autonomous execution?",
+  "Can on-chain knowledge graphs trace the evidence behind research claims?",
+  "How can federated learning and verifiable compute form a trusted experiment pipeline?",
+  "Can high-quality on-chain data improve the robustness of systematic strategies?",
+  "Is there a feedback loop among sentiment, influencer reach, and liquidity?",
+  "How can AI-native development enable individuals to deliver end to end?",
+  "How can an AI community identify needs and organize trusted mutual help?",
+  "Can apprenticeships and shared long-term upside improve education incentives?",
+  "How can simulated agent emotion translate into real-world trust?",
 ];
 
 function expansionPosition(index: number): [number, number, number] {
@@ -991,7 +1027,7 @@ function Avatar({
           <meshStandardMaterial color="#11191c" />
         </RoundedBox>
       </group>
-      {(selected || agent.action === "交流") && (
+      {(selected || agent.action === "Discuss") && (
         <Billboard position={[0, 2.5, 0]}>
           <Html center>
             <div className="agent-bubble">
@@ -1171,29 +1207,29 @@ function Scene({
       <CampusDetails />
       <Classroom
         position={[-7.4, 0, 4.2]}
-        label="AI 安全与对齐教室"
+        label="AI Safety & Alignment Classroom"
         color="#f1c875"
       />
       <Classroom
         position={[7.2, 0, 4.5]}
-        label="智能合约研讨教室"
+        label="Smart Contract Seminar Room"
         color="#8fd7ff"
       />
       <House position={[0, 0, 7.8]} color="#49675c" research />
       <ModernLab position={[7.4, 0, -4.5]} glow="#8de7df" />
       <ResearchDome
         position={[-7.6, 0, -4.5]}
-        label="Web3 协议实验室"
+        label="Web3 Protocol Lab"
         color="#b59aff"
       />
       <ResearchDome
         position={[-9.5, 0, 1]}
-        label="隐私计算实验室"
+        label="Privacy Computing Lab"
         color="#7ee0ad"
       />
       <ResearchDome
         position={[9.5, 0, 0.8]}
-        label="具身智能实验室"
+        label="Embodied AI Lab"
         color="#ff9b71"
       />
       {Array.from({ length: completed }, (_, index) => (
@@ -1203,12 +1239,14 @@ function Scene({
           index={index}
         />
       ))}
-      <WorldLabel position={[0, 7.2, -7]}>悉尼大学主楼 · Quadrangle</WorldLabel>
+      <WorldLabel position={[0, 7.2, -7]}>
+        University of Sydney · Quadrangle
+      </WorldLabel>
       <WorldLabel position={[7.4, 3.8, -4.5]} color="#9fdced">
-        生成式 AI 实验室
+        Generative AI Laboratory
       </WorldLabel>
       <WorldLabel position={[0, 2.1, 0]} color="#ffe0a3">
-        校园草坪 · 公共交流区
+        Quadrangle Lawn · Commons
       </WorldLabel>
       <group position={[0, 0, 0]}>
         <mesh position={[0, 0.18, 0]}>
@@ -1247,7 +1285,7 @@ function Scene({
           </mesh>
         ))}
         <WorldLabel position={[0, 2.5, 0]} color="#f7d873">
-          建造中：{PROJECTS[completed % PROJECTS.length].name} ·{" "}
+          Building: {PROJECTS[completed % PROJECTS.length].name} ·{" "}
           {Math.round(progress)}%
         </WorldLabel>
       </group>
@@ -1300,14 +1338,14 @@ export default function Home() {
   const agent = agents.find((a) => a.id === selected) || agents[0];
   const dayPhase =
     minute < 300
-      ? "深夜"
+      ? "Late Night"
       : minute < 420
-        ? "日出"
+        ? "Sunrise"
         : minute < 1020
-          ? "白昼"
+          ? "Daytime"
           : minute < 1140
-            ? "黄昏"
-            : "夜晚";
+            ? "Dusk"
+            : "Night";
   const addEvent = useCallback(
     (text: string, kind: EventItem["kind"], time: number) =>
       setEvents((e) =>
@@ -1329,35 +1367,37 @@ export default function Home() {
               cur = old[idx];
             const actions: Action[] =
               cur.energy < 35
-                ? ["休息"]
+                ? ["Rest"]
                 : cur.social < 42
-                  ? ["交流"]
-                  : ["探索", "采集", "研究", "建造", "交流"];
+                  ? ["Discuss"]
+                  : ["Explore", "Gather", "Research", "Build", "Discuss"];
             const action = actions[Math.floor(Math.random() * actions.length)],
               t = TARGETS[Math.floor(Math.random() * TARGETS.length)];
             const thoughts: Record<Action, string> = {
-              探索: "去另一间实验室看看是否有可复用的数据集。",
-              采集: "先申请团队最紧缺的算力与实验样本。",
-              研究: "模型行为与链上激励之间可能存在因果关系。",
-              建造: "再完成一组设施就能启动跨学科实验。",
-              休息: "暂停训练，整理实验假设与失败记录。",
-              交流: "这组结果应该交给伙伴做交叉验证。",
-              工作: "今天的基准评测与复现实验需要完成。",
+              Explore: "Another lab may have a reusable dataset.",
+              Gather: "Secure the compute and samples the team needs most.",
+              Research:
+                "Model behavior and on-chain incentives may be causally linked.",
+              Build:
+                "One more facility will unlock a cross-disciplinary experiment.",
+              Rest: "Pause training and organize the hypotheses and failure notes.",
+              Discuss: "A colleague should cross-validate these results.",
+              Work: "Today's benchmark and replication run still need completion.",
             };
             const copy = [...old];
             copy[idx] = {
               ...cur,
               action,
               thought: thoughts[action],
-              reason: `环境变化与「${cur.goal}」产生关联`,
+              reason: `A change in the environment is relevant to “${cur.goal}”`,
               target: t,
               energy: Math.max(
                 18,
-                Math.min(100, cur.energy + (action === "休息" ? 12 : -3)),
+                Math.min(100, cur.energy + (action === "Rest" ? 12 : -3)),
               ),
               speech:
-                action === "交流"
-                  ? "我有一组 AI × Web3 结果，谁来做同行评审？"
+                action === "Discuss"
+                  ? "I have new AI × Web3 results. Who can peer-review them?"
                   : undefined,
               xp: ((cur.xp || 0) + 4 * speed) % 100,
               level:
@@ -1381,9 +1421,9 @@ export default function Home() {
             const trust = a.relations[b.id] ?? 50;
             const conflict = trust < 50 || Math.random() < 0.18;
             const outcome = conflict
-              ? `${a.name}质疑${b.name}的实验假设，双方决定增加对照组`
-              : `${a.name}与${b.name}形成新共识，并约定共享复现实验结果`;
-            const memory = `${formatTime(next)} 与${b.name}讨论：${topic}`;
+              ? `${a.name} challenged ${b.name}'s hypothesis; they added a control group`
+              : `${a.name} and ${b.name} reached a new consensus and agreed to share replication results`;
+            const memory = `${formatTime(next)} — discussed with ${b.name}: ${topic}`;
             const delta = conflict ? -2 : 3;
             const meeting: [number, number, number] = [
               TARGETS[(first + second) % TARGETS.length][0],
@@ -1396,7 +1436,7 @@ export default function Home() {
               const partner = index === first ? b : a;
               return {
                 ...person,
-                action: "交流",
+                action: "Discuss",
                 target:
                   index === first
                     ? meeting
@@ -1407,12 +1447,12 @@ export default function Home() {
                       ]),
                 speech:
                   index === first
-                    ? `从${person.skills[0]}出发，我想验证：${topic}`
+                    ? `From a ${person.skills[0]} perspective, I want to test: ${topic}`
                     : conflict
-                      ? `从${person.skills[0]}角度我不同意，先补一组可复现实验。`
-                      : `同意，我用${person.skills[0]}来设计验证指标。`,
-                thought: `${partner.role}的视角正在改变我的研究判断。`,
-                reason: `近期记忆、共同目标与对${partner.name}的信任共同触发了讨论`,
+                      ? `From my ${person.skills[0]} perspective, I disagree. Let's add a reproducible test.`
+                      : `Agreed. I'll design the validation using ${person.skills[0]}.`,
+                thought: `${partner.role}'s perspective is changing my research judgment.`,
+                reason: `Recent memories, shared goals, and trust in ${partner.name} triggered this discussion`,
                 memory: [memory, ...person.memory].slice(0, 4),
                 relations: {
                   ...person.relations,
@@ -1435,7 +1475,7 @@ export default function Home() {
             setCompleted((count) => {
               const built = PROJECTS[count % PROJECTS.length];
               addEvent(
-                `${built.name}完工，新课程与跨实验室科研项目现已开放`,
+                `${built.name} is complete; new courses and cross-lab projects are now open`,
                 "world",
                 next,
               );
@@ -1445,10 +1485,10 @@ export default function Home() {
               old.map((person) => ({
                 ...person,
                 xp: Math.min(99, (person.xp || 0) + 12),
-                memory: ["团队共同完成了新的科研设施", ...person.memory].slice(
-                  0,
-                  3,
-                ),
+                memory: [
+                  "The team completed a new research facility",
+                  ...person.memory,
+                ].slice(0, 3),
               })),
             );
             return 0;
@@ -1470,12 +1510,12 @@ export default function Home() {
       completed,
       events,
     };
-    localStorage.setItem("lumora-world", JSON.stringify(snapshot));
+    localStorage.setItem("lumora-world-en-v1", JSON.stringify(snapshot));
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   };
   const restore = () => {
-    const raw = localStorage.getItem("lumora-world");
+    const raw = localStorage.getItem("lumora-world-en-v1");
     if (!raw) return;
     const s = JSON.parse(raw) as Snapshot;
     setAgents(s.agents);
@@ -1495,43 +1535,51 @@ export default function Home() {
           </span>
           <div>
             <b>LUMORA</b>
-            <small>悉尼大学 AI 校园实验室</small>
+            <small>University of Sydney AI Campus Lab</small>
           </div>
         </div>
         <div className="world-status">
           <span className={paused ? "dot paused" : "dot"} />
-          <b>{paused ? "世界已暂停" : "世界运行中"}</b>
-          <span>第 12 天 · {formatTime(minute)}</span>
+          <b>{paused ? "World Paused" : "World Running"}</b>
+          <span>Day 12 · {formatTime(minute)}</span>
           <span className="weather">
             {minute >= 420 && minute < 1080 ? "☀" : "☾"} {dayPhase} · 18°C
           </span>
         </div>
         <div className="header-actions">
-          <button className="icon-button" onClick={save} title="保存世界">
+          <button className="icon-button" onClick={save} title="Save world">
             <Save size={17} />
           </button>
-          <button className="icon-button" onClick={restore} title="恢复存档">
+          <button
+            className="icon-button"
+            onClick={restore}
+            title="Restore world"
+          >
             <RotateCcw size={17} />
           </button>
           <button className="primary" onClick={() => setPaused((v) => !v)}>
             {paused ? <Play size={16} /> : <Pause size={16} />}{" "}
-            {paused ? "继续" : "暂停"}
+            {paused ? "Resume" : "Pause"}
           </button>
         </div>
       </header>
-      <section className="metric-strip" aria-label="世界指标">
+      <section className="metric-strip" aria-label="World metrics">
         {[
-          ["研究成员", agents.length, `${agents.length} 位跨学科成员`],
-          ["共享算力", 82, "训练额度持续恢复"],
-          ["科研知识", Math.round(knowledge), "实验结论持续积累"],
-          ["复现可信度", 68, "证据与同行评审综合"],
-          ["团队信任度", 57, "合作关系动态演化"],
+          [
+            "Researchers",
+            agents.length,
+            `${agents.length} interdisciplinary agents`,
+          ],
+          ["Shared Compute", 82, "Training capacity recovering"],
+          ["Knowledge", Math.round(knowledge), "Evidence is accumulating"],
+          ["Reproducibility", 68, "Evidence and peer review"],
+          ["Team Trust", 57, "Relationships evolve live"],
         ].map(([label, value, note], index) => (
           <article className="metric-card" key={String(label)}>
             <span>{label}</span>
             <div>
               <b>{value}</b>
-              <small>{index === 0 ? "人" : "/100"}</small>
+              <small>{index === 0 ? " agents" : "/100"}</small>
             </div>
             <p>{note}</p>
             <i>
@@ -1549,18 +1597,19 @@ export default function Home() {
           className={`left-rail town-drawer roster-drawer ${showRoster ? "open" : ""}`}
         >
           <div className="rail-heading">
-            <span>改变世界</span>
+            <span>Shape the World</span>
             <small>ACTIONS</small>
           </div>
           <p className="rail-copy">
-            观察 AI × Web3 学术社区，跟踪实验、课程、争论与跨学科协作。
+            Observe an AI × Web3 research community as experiments, debates, and
+            collaborations unfold.
           </p>
           <div className="people-panel">
             <div className="dock-title">
               <span>
-                <Users size={15} /> 居民名册
+                <Users size={15} /> Agent Roster
               </span>
-              <small>{agents.length} 在线</small>
+              <small>{agents.length} online</small>
             </div>
             <div className="people-list">
               {agents.map((a) => (
@@ -1586,9 +1635,9 @@ export default function Home() {
           <div className="project-panel">
             <div className="dock-title">
               <span>
-                <Bot size={15} /> 共同建设
+                <Bot size={15} /> Collaborative Build
               </span>
-              <small>{completed} 座完成</small>
+              <small>{completed} completed</small>
             </div>
             <div className="project-line">
               <div className="project-icon">⌂</div>
@@ -1603,13 +1652,13 @@ export default function Home() {
             </div>
             <div className="resources">
               <span>
-                算力 <b>{Math.round(wood)}</b>
+                Compute <b>{Math.round(wood)}</b>
               </span>
               <span>
-                知识 <b>{Math.round(knowledge)}</b>
+                Knowledge <b>{Math.round(knowledge)}</b>
               </span>
               <span>
-                数据 <b>82</b>
+                Data <b>82</b>
               </span>
             </div>
           </div>
@@ -1636,7 +1685,7 @@ export default function Home() {
               minute={minute}
             />
           </Canvas>
-          <div className="town-ui-tools" aria-label="小镇界面面板">
+          <div className="town-ui-tools" aria-label="Town interface panels">
             <button
               className={showRoster ? "active" : ""}
               onClick={() => {
@@ -1645,7 +1694,7 @@ export default function Home() {
               }}
               aria-pressed={showRoster}
             >
-              <Users size={15} /> 人物
+              <Users size={15} /> Agents
             </button>
             <button
               className={showInspector ? "active" : ""}
@@ -1655,20 +1704,20 @@ export default function Home() {
               }}
               aria-pressed={showInspector}
             >
-              <BrainCircuit size={15} /> 详情
+              <BrainCircuit size={15} /> Profile
             </button>
             <button
               className={showEvents ? "active" : ""}
               onClick={() => setShowEvents((value) => !value)}
               aria-pressed={showEvents}
             >
-              <MessageCircle size={15} /> 事件
+              <MessageCircle size={15} /> Events
             </button>
           </div>
           <div className="scene-title">
-            <span>悉尼大学 · Camperdown</span>
+            <span>University of Sydney · Camperdown</span>
             <small>
-              <Eye size={13} /> AI 校园实时视图
+              <Eye size={13} /> Live AI Campus
             </small>
           </div>
           <div className="camera-tools">
@@ -1676,13 +1725,13 @@ export default function Home() {
               className={!follow ? "active" : ""}
               onClick={() => setFollow(null)}
             >
-              <Box size={15} /> 自由镜头
+              <Box size={15} /> Free Camera
             </button>
             <button
               className={follow ? "active" : ""}
               onClick={() => setFollow(selected)}
             >
-              <Eye size={15} /> 跟随 {agent.name}
+              <Eye size={15} /> Follow {agent.name}
             </button>
           </div>
           <div className="speed-controls">
@@ -1699,14 +1748,14 @@ export default function Home() {
               </button>
             ))}
           </div>
-          {saved && <div className="toast">世界状态已保存到此设备</div>}
+          {saved && <div className="toast">World saved on this device</div>}
         </div>
         <aside
           className={`inspector town-drawer inspector-drawer ${showInspector ? "open" : ""}`}
         >
           <div className="section-heading">
             <div>
-              <small>已选择角色</small>
+              <small>Selected Agent</small>
               <h1>{agent.name}</h1>
             </div>
             <span className="role-chip" style={{ background: agent.accent }}>
@@ -1728,21 +1777,21 @@ export default function Home() {
           </div>
           <div className="state-grid">
             <div>
-              <span>体力</span>
+              <span>Energy</span>
               <b>{agent.energy}%</b>
               <i>
                 <em style={{ width: `${agent.energy}%` }} />
               </i>
             </div>
             <div>
-              <span>社交</span>
+              <span>Social</span>
               <b>{agent.social}%</b>
               <i>
                 <em style={{ width: `${agent.social}%` }} />
               </i>
             </div>
             <div className="growth-stat">
-              <span>成长等级</span>
+              <span>Growth Level</span>
               <b>Lv.{agent.level || 1}</b>
               <i>
                 <em style={{ width: `${agent.xp || 0}%` }} />
@@ -1751,35 +1800,35 @@ export default function Home() {
           </div>
           <section className="info-card thought">
             <div className="card-label">
-              <BrainCircuit size={14} /> 当前想法
+              <BrainCircuit size={14} /> Current Thought
             </div>
             <p>“{agent.thought}”</p>
-            <small>决策依据 · {agent.reason}</small>
+            <small>Decision basis · {agent.reason}</small>
           </section>
           <section className="detail-section">
-            <h2>当前目标</h2>
+            <h2>Current Goal</h2>
             <div className="goal-row">
               <span className="goal-icon">
                 <ChevronRight size={16} />
               </span>
               <div>
                 <b>{agent.goal}</b>
-                <small>正在执行 · {agent.action}</small>
+                <small>Current action · {agent.action}</small>
               </div>
             </div>
           </section>
           <section className="detail-section">
-            <h2>记忆</h2>
+            <h2>Memories</h2>
             {agent.memory.map((m, i) => (
               <div className="memory" key={m}>
                 <Clock3 size={14} />
                 <span>{m}</span>
-                <small>{i + 2} 小时前</small>
+                <small>{i + 2} hours ago</small>
               </div>
             ))}
           </section>
           <section className="detail-section">
-            <h2>社会关系</h2>
+            <h2>Relationships</h2>
             <div className="relations">
               {Object.entries(agent.relations).map(([id, val]) => {
                 const p = agents.find((a) => a.id === id);
@@ -1804,7 +1853,7 @@ export default function Home() {
             </div>
           </section>
           <button className="follow-button" onClick={() => setFollow(agent.id)}>
-            <Eye size={16} /> 第三人称跟随
+            <Eye size={16} /> Third-person Follow
           </button>
         </aside>
       </section>
@@ -1814,9 +1863,9 @@ export default function Home() {
         <div className="event-panel">
           <div className="dock-title">
             <span>
-              <MessageCircle size={15} /> 实时事件
+              <MessageCircle size={15} /> Live Events
             </span>
-            <small>持续更新</small>
+            <small>Updating continuously</small>
           </div>
           <div className="event-list">
             {events.slice(0, 4).map((e) => (
@@ -1833,9 +1882,11 @@ export default function Home() {
         <span>
           <span className="dot" /> RULE ENGINE · LOCAL
         </span>
-        <span>科研循环：观察 → 假设 → 讨论 → 实验 → 记忆迭代</span>
         <span>
-          <FastForward size={13} /> {speed}× 模拟速度
+          Research loop: Observe → Hypothesize → Discuss → Experiment → Remember
+        </span>
+        <span>
+          <FastForward size={13} /> {speed}× simulation speed
         </span>
       </footer>
     </main>
