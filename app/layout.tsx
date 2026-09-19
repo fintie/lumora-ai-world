@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body className={`${sans.variable} ${mono.variable}`}>{children}</body>
     </html>
   );
