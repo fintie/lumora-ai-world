@@ -6,20 +6,20 @@ const sans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const mono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL("https://lumora-ai-world.sweet-boot-8960.chatgpt.site"),
-  title: "Lumora · 3D 自主世界实验室",
+  title: "Lumora · 3D Autonomous World Lab",
   description:
-    "一个持续运行的 3D AI 虚拟聚落，居民会观察、决策、协作并改变世界。",
+    "A continuously running 3D AI community where autonomous agents observe, decide, collaborate, and reshape their world.",
   openGraph: {
-    title: "LUMORA · 自主世界实验室",
+    title: "LUMORA · Autonomous World Lab",
     description:
-      "六位 AI 居民在持续运行的 3D 森林聚落中观察、决策、协作并改变世界。",
+      "Autonomous AI researchers observe, decide, collaborate, and reshape a living 3D campus.",
     images: ["/og.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LUMORA · 自主世界实验室",
+    title: "LUMORA · Autonomous World Lab",
     description:
-      "六位 AI 居民在持续运行的 3D 森林聚落中观察、决策、协作并改变世界。",
+      "Autonomous AI researchers observe, decide, collaborate, and reshape a living 3D campus.",
     images: ["/og.png"],
   },
 };
