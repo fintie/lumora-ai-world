@@ -3,10 +3,12 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Billboard,
+  ContactShadows,
   Environment,
   Html,
   OrbitControls,
   RoundedBox,
+  Sparkles as WorldSparkles,
   Stars,
 } from "@react-three/drei";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -829,17 +831,33 @@ function expansionPosition(index: number): [number, number, number] {
 function Tree({ x, z, s = 1 }: { x: number; z: number; s?: number }) {
   return (
     <group position={[x, 0, z]} scale={s}>
+      {[0, 1, 2].map((i) => (
+        <mesh key={`root-${i}`} position={[Math.cos(i * 2.1) * 0.2, 0.12, Math.sin(i * 2.1) * 0.2]} rotation={[0, i * 2.1, Math.PI / 2.8]} castShadow>
+          <cylinderGeometry args={[0.055, 0.11, 0.62, 6]} />
+          <meshStandardMaterial color="#594033" roughness={1} />
+        </mesh>
+      ))}
       <mesh position={[0, 0.85, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.25, 1.7, 7]} />
-        <meshStandardMaterial color="#684a39" roughness={1} />
+        <meshStandardMaterial color="#684a39" roughness={1} flatShading />
       </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.24, 1.42, 0]} rotation={[0, 0, side * 0.75]} castShadow>
+          <cylinderGeometry args={[0.045, 0.085, 0.72, 6]} />
+          <meshStandardMaterial color="#604535" roughness={1} />
+        </mesh>
+      ))}
       <mesh position={[0, 2, 0]} castShadow>
         <coneGeometry args={[1.05, 2.4, 8]} />
-        <meshStandardMaterial color="#234d47" roughness={0.95} />
+        <meshStandardMaterial color="#234d47" roughness={0.95} flatShading />
       </mesh>
       <mesh position={[0.2, 2.7, 0.1]} castShadow>
         <coneGeometry args={[0.75, 1.6, 8]} />
-        <meshStandardMaterial color="#3e7160" roughness={0.95} />
+        <meshStandardMaterial color="#3e7160" roughness={0.95} flatShading />
+      </mesh>
+      <mesh position={[-0.25, 1.65, 0.08]} rotation={[0, 0.35, 0]} castShadow>
+        <coneGeometry args={[0.72, 1.45, 8]} />
+        <meshStandardMaterial color="#315f51" roughness={1} flatShading />
       </mesh>
     </group>
   );
@@ -1025,6 +1043,52 @@ function Jacaranda({ x, z }: { x: number; z: number }) {
     </group>
   );
 }
+
+function GroundDetails({ daylight }: { daylight: number }) {
+  const grass = useMemo(
+    () => Array.from({ length: 72 }, (_, i) => {
+      const angle = i * 2.39996;
+      const radius = 10.8 + ((i * 37) % 92) / 10;
+      return [Math.cos(angle) * radius, Math.sin(angle) * radius, 0.65 + (i % 5) * 0.08] as const;
+    }),
+    [],
+  );
+  const stones = useMemo(
+    () => Array.from({ length: 22 }, (_, i) => {
+      const angle = i * 1.73 + 0.4;
+      const radius = 18.8 + (i % 3) * 0.48;
+      return [Math.cos(angle) * radius, Math.sin(angle) * radius, 0.24 + (i % 4) * 0.07] as const;
+    }),
+    [],
+  );
+  return (
+    <group>
+      {grass.map(([x, z, scale], i) => (
+        <group key={`grass-${i}`} position={[x, 0.03, z]} scale={scale} rotation={[0, i * 0.91, 0]}>
+          {[-0.08, 0, 0.08].map((offset, blade) => (
+            <mesh key={offset} position={[offset, 0.22 + blade * 0.025, 0]} rotation={[0, 0, offset * 3.4]}>
+              <coneGeometry args={[0.045, 0.5 + blade * 0.06, 5]} />
+              <meshStandardMaterial color={blade === 1 ? "#78935f" : "#557650"} roughness={1} />
+            </mesh>
+          ))}
+          {i % 6 === 0 && (
+            <mesh position={[0.12, 0.48, 0.04]}>
+              <icosahedronGeometry args={[0.075, 1]} />
+              <meshStandardMaterial color={i % 12 ? "#f3d9a1" : "#d9b6d8"} emissive="#8e6d58" emissiveIntensity={0.25} />
+            </mesh>
+          )}
+        </group>
+      ))}
+      {stones.map(([x, z, scale], i) => (
+        <mesh key={`stone-${i}`} position={[x, scale * 0.45, z]} scale={[1.35, 0.72, 1]} rotation={[i * 0.17, i * 0.61, 0.12]} castShadow>
+          <dodecahedronGeometry args={[scale, 0]} />
+          <meshStandardMaterial color={i % 2 ? "#77766c" : "#918b77"} roughness={0.98} />
+        </mesh>
+      ))}
+      <WorldSparkles count={daylight < 0.35 ? 90 : 28} scale={[38, 8, 38]} size={daylight < 0.35 ? 2.2 : 1.1} speed={0.18} color={daylight < 0.35 ? "#ffe6a2" : "#fff2c7"} opacity={0.55} />
+    </group>
+  );
+}
 function House({
   position,
   color = "#d9925b",
@@ -1051,8 +1115,14 @@ function House({
       </RoundedBox>
       <mesh position={[0, 2.15, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
         <coneGeometry args={[2.25, 1.4, 4]} />
-        <meshStandardMaterial color={color} roughness={0.9} />
+        <meshStandardMaterial color={color} roughness={0.78} flatShading />
       </mesh>
+      {[-0.72, 0, 0.72].map((offset) => (
+        <mesh key={`roof-rib-${offset}`} position={[offset, 2.12, 0.03]} rotation={[0, Math.PI / 4, 0]} castShadow>
+          <boxGeometry args={[0.055, 1.46, 3.05]} />
+          <meshStandardMaterial color="#413b36" roughness={0.9} />
+        </mesh>
+      ))}
       <mesh position={[0, 0.65, 1.23]}>
         <boxGeometry args={[0.58, 1.25, 0.08]} />
         <meshStandardMaterial color="#704e38" />
@@ -1064,6 +1134,18 @@ function House({
           emissive="#ff9b3d"
           emissiveIntensity={3.2}
         />
+      </mesh>
+      <mesh position={[-0.8, 1.15, 1.31]}>
+        <boxGeometry args={[0.7, 0.08, 0.05]} />
+        <meshStandardMaterial color="#ead7b1" roughness={0.8} />
+      </mesh>
+      <mesh position={[-0.8, 1.15, 1.32]}>
+        <boxGeometry args={[0.08, 0.7, 0.05]} />
+        <meshStandardMaterial color="#ead7b1" roughness={0.8} />
+      </mesh>
+      <mesh position={[0.88, 2.9, -0.45]} castShadow>
+        <boxGeometry args={[0.42, 1.05, 0.42]} />
+        <meshStandardMaterial color="#87644e" roughness={0.94} />
       </mesh>
       <pointLight
         position={[-0.8, 1.2, 1.8]}
@@ -1659,6 +1741,35 @@ function Avatar({
           roughness={0.12}
         />
       </RoundedBox>
+      {[-0.43, 0.43].map((x) => (
+        <group key={`ear-${x}`} position={[x, 1.75, 0]}>
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.105, 0.105, 0.08, 16]} />
+            <meshStandardMaterial color="#89979a" metalness={0.72} roughness={0.28} />
+          </mesh>
+          <mesh position={[x < 0 ? -0.045 : 0.045, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.045, 0.045, 0.012, 12]} />
+            <meshStandardMaterial color={agent.accent} emissive={agent.accent} emissiveIntensity={1.4} />
+          </mesh>
+        </group>
+      ))}
+      <group position={[0, 2.08, 0]}>
+        <mesh position={[0, 0.14, 0]} castShadow>
+          <cylinderGeometry args={[0.018, 0.035, 0.28, 8]} />
+          <meshStandardMaterial color="#8c9999" metalness={0.65} />
+        </mesh>
+        <mesh position={[0, 0.31, 0]}>
+          <sphereGeometry args={[0.055, 12, 12]} />
+          <meshStandardMaterial color={glow} emissive={glow} emissiveIntensity={3.2} />
+        </mesh>
+      </group>
+      <mesh position={[0, 1.15, 0.3]}>
+        <circleGeometry args={[0.105, 20]} />
+        <meshStandardMaterial color={agent.accent} emissive={agent.accent} emissiveIntensity={2.2} metalness={0.3} />
+      </mesh>
+      <RoundedBox args={[0.5, 0.48, 0.18]} radius={0.07} smoothness={4} position={[0, 1.12, -0.34]} castShadow>
+        <meshStandardMaterial color="#374447" metalness={0.48} roughness={0.46} />
+      </RoundedBox>
       {[-0.15, 0.15].map((x) => (
         <mesh key={x} position={[x, 1.75, 0.395]}>
           <capsuleGeometry args={[0.035, 0.09, 5, 10]} />
@@ -1830,12 +1941,28 @@ function Scene({
         intensity={0.18 + daylight * 0.72}
         color={daylight > 0.2 ? "#d8e5d6" : "#6378a0"}
       />
+      <hemisphereLight
+        args={[
+          daylight > 0.2 ? "#d9e7ed" : "#31416d",
+          daylight > 0.2 ? "#605142" : "#182037",
+          0.32 + daylight * 0.42,
+        ]}
+      />
       <directionalLight
         position={sunPosition}
         intensity={0.12 + daylight * 1.65}
         color={daylight > 0.2 ? "#ffe1a2" : "#8097c9"}
         castShadow
         shadow-mapSize={[1024, 1024]}
+      />
+      <spotLight
+        position={[-11, 15, 8]}
+        angle={0.68}
+        penumbra={0.9}
+        intensity={0.25 + daylight * 0.72}
+        color="#ffd7a0"
+        castShadow
+        shadow-mapSize={[512, 512]}
       />
       {daylight < 0.28 && (
         <Stars radius={50} depth={20} count={700} factor={1.7} fade />
@@ -1982,6 +2109,7 @@ function Scene({
       {trees.map((t, i) => (
         <Tree key={i} x={t[0]} z={t[1]} s={t[2]} />
       ))}
+      <GroundDetails daylight={daylight} />
       <Jacaranda x={-4.6} z={0.8} />
       <Jacaranda x={4.7} z={0.5} />
       <ReflectionGarden />
@@ -2122,6 +2250,15 @@ function Scene({
           speed={speed}
         />
       ))}
+      <ContactShadows
+        position={[0, 0.045, 0]}
+        scale={42}
+        opacity={0.34}
+        blur={2.2}
+        far={16}
+        resolution={512}
+        color="#162522"
+      />
       <CameraRig follow={follow} agents={agents} />
       <OrbitControls
         makeDefault
@@ -2652,6 +2789,12 @@ export default function Home() {
             shadows
             camera={{ position: [16, 26, 20], fov: 38 }}
             dpr={[1, 1.6]}
+            gl={{
+              antialias: true,
+              toneMapping: THREE.ACESFilmicToneMapping,
+              toneMappingExposure: 1.08,
+              powerPreference: "high-performance",
+            }}
           >
             <Scene
               agents={agents}
