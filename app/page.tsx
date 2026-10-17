@@ -643,32 +643,100 @@ const START_EVENTS: EventItem[] = [
     text: "The morning compute window opened and training capacity recovered",
   },
 ];
-const TARGETS: [number, number, number][] = [
-  [-15, 0, -10],
-  [-15, 0, 3],
-  [-13, 0, 11],
-  [-8, 0, 15],
-  [0, 0, 16],
-  [8, 0, 15],
-  [14, 0, 10],
-  [16, 0, 2],
-  [14, 0, -7],
-  [9, 0, -12],
-  [3, 0, -14],
-  [-4, 0, -14],
-  [-10, 0, -11],
-  [-11, 0, -4],
-  [-8, 0, 4],
-  [-5, 0, 12],
-  [5, 0, 12],
-  [10, 0, 5],
-  [8, 0, -4],
-  [4, 0, -9],
-  [-4, 0, -9],
-  [0, 0, 0],
-  [-1, 0, 7],
-  [3, 0, -2],
+const OUTER_ROAD_COUNT = 16;
+const INNER_ROAD_COUNT = 8;
+const ROAD_OFFSET = Math.PI / 8;
+const ROAD_NODES: [number, number, number][] = [
+  ...Array.from({ length: OUTER_ROAD_COUNT }, (_, index) => {
+    const angle = ROAD_OFFSET + (index / OUTER_ROAD_COUNT) * Math.PI * 2;
+    return [Math.cos(angle) * 18.7, 0, Math.sin(angle) * 18.7] as [
+      number,
+      number,
+      number,
+    ];
+  }),
+  ...Array.from({ length: INNER_ROAD_COUNT }, (_, index) => {
+    const angle = ROAD_OFFSET + (index / INNER_ROAD_COUNT) * Math.PI * 2;
+    return [Math.cos(angle) * 4.8, 0, Math.sin(angle) * 4.8] as [
+      number,
+      number,
+      number,
+    ];
+  }),
+  [0, 0, 0] as [number, number, number],
 ];
+const TARGETS = ROAD_NODES;
+
+function roadNeighbours(index: number): number[] {
+  if (index < OUTER_ROAD_COUNT) {
+    const neighbours = [
+      (index - 1 + OUTER_ROAD_COUNT) % OUTER_ROAD_COUNT,
+      (index + 1) % OUTER_ROAD_COUNT,
+    ];
+    if (index % 2 === 0) neighbours.push(OUTER_ROAD_COUNT + index / 2);
+    return neighbours;
+  }
+  if (index < OUTER_ROAD_COUNT + INNER_ROAD_COUNT) {
+    const inner = index - OUTER_ROAD_COUNT;
+    return [
+      OUTER_ROAD_COUNT + ((inner - 1 + INNER_ROAD_COUNT) % INNER_ROAD_COUNT),
+      OUTER_ROAD_COUNT + ((inner + 1) % INNER_ROAD_COUNT),
+      inner * 2,
+      OUTER_ROAD_COUNT + INNER_ROAD_COUNT,
+    ];
+  }
+  return Array.from(
+    { length: INNER_ROAD_COUNT },
+    (_, inner) => OUTER_ROAD_COUNT + inner,
+  );
+}
+
+function closestRoadNode(position: THREE.Vector3): number {
+  let best = 0;
+  let bestDistance = Infinity;
+  ROAD_NODES.forEach(([x, , z], index) => {
+    const distance = (position.x - x) ** 2 + (position.z - z) ** 2;
+    if (distance < bestDistance) {
+      best = index;
+      bestDistance = distance;
+    }
+  });
+  return best;
+}
+
+function buildRoadRoute(
+  from: THREE.Vector3,
+  destination: THREE.Vector3,
+): THREE.Vector3[] {
+  const start = closestRoadNode(from);
+  const finish = closestRoadNode(destination);
+  const queue = [start];
+  const previous = new Map<number, number>();
+  const visited = new Set([start]);
+  while (queue.length) {
+    const current = queue.shift()!;
+    if (current === finish) break;
+    roadNeighbours(current).forEach((next) => {
+      if (visited.has(next)) return;
+      visited.add(next);
+      previous.set(next, current);
+      queue.push(next);
+    });
+  }
+  const indexes = [finish];
+  while (indexes[0] !== start && previous.has(indexes[0])) {
+    indexes.unshift(previous.get(indexes[0])!);
+  }
+  const route = indexes.map(
+    (index) =>
+      new THREE.Vector3(ROAD_NODES[index][0], 0.06, ROAD_NODES[index][2]),
+  );
+  const routeEnd = route.at(-1);
+  if (!routeEnd || routeEnd.distanceTo(destination) > 0.12) {
+    route.push(new THREE.Vector3(destination.x, 0.06, destination.z));
+  }
+  return route;
+}
 const PROJECTS = [
   {
     name: "Multi-Agent Research Center",
@@ -1436,6 +1504,8 @@ function Avatar({
   );
   const turner = useMemo(() => new THREE.Object3D(), []);
   const direction = useMemo(() => new THREE.Vector3(), []);
+  const route = useRef<THREE.Vector3[]>([]);
+  const lastTargetKey = useRef("");
   const walkSpeed = useMemo(
     () =>
       1.05 +
@@ -1445,13 +1515,41 @@ function Avatar({
     [agent.id],
   );
   useFrame((state, dt) => {
-    if (!ref.current || paused) return;
+    if (!ref.current) return;
+    if (paused) {
+      ref.current.position.y = THREE.MathUtils.damp(
+        ref.current.position.y,
+        0.06,
+        12,
+        dt,
+      );
+      return;
+    }
+    const targetKey = `${target.x.toFixed(2)}:${target.z.toFixed(2)}`;
+    if (lastTargetKey.current !== targetKey) {
+      route.current = buildRoadRoute(ref.current.position, target);
+      if (route.current[0]?.distanceTo(ref.current.position) < 0.25) {
+        route.current.shift();
+      }
+      lastTargetKey.current = targetKey;
+    }
+    let waypoint = route.current[0] || target;
     direction.set(
-      target.x - ref.current.position.x,
+      waypoint.x - ref.current.position.x,
       0,
-      target.z - ref.current.position.z,
+      waypoint.z - ref.current.position.z,
     );
-    const distance = direction.length();
+    let distance = direction.length();
+    if (distance < 0.18 && route.current.length) {
+      route.current.shift();
+      waypoint = route.current[0] || target;
+      direction.set(
+        waypoint.x - ref.current.position.x,
+        0,
+        waypoint.z - ref.current.position.z,
+      );
+      distance = direction.length();
+    }
     const walking = distance > 0.18;
     const motion = THREE.MathUtils.smoothstep(distance, 0.12, 0.9);
     const simPace = Math.sqrt(speed);
@@ -1462,7 +1560,7 @@ function Avatar({
         Math.min(distance - 0.12, dt * walkSpeed * simPace),
       );
       turner.position.copy(ref.current.position);
-      turner.lookAt(target.x, ref.current.position.y, target.z);
+      turner.lookAt(waypoint.x, ref.current.position.y, waypoint.z);
       ref.current.quaternion.slerp(turner.quaternion, 1 - Math.exp(-dt * 6.5));
     }
     const strideTime = state.clock.elapsedTime * 5.4 * walkSpeed * simPace;
@@ -1510,6 +1608,18 @@ function Avatar({
           <ringGeometry args={[0.55, 0.72, 32]} />
           <meshBasicMaterial color="#f5da73" transparent opacity={0.85} />
         </mesh>
+      )}
+      {!selected && agent.action === "Discuss" && (
+        <Billboard position={[0, 2.42, 0]}>
+          <Html center>
+            <div
+              className="talk-indicator"
+              aria-label={`${agent.name} is talking`}
+            >
+              •••
+            </div>
+          </Html>
+        </Billboard>
       )}
       <RoundedBox
         args={[0.7, 0.72, 0.55]}
@@ -1748,6 +1858,36 @@ function Scene({
           roughness={0.95}
         />
       </mesh>
+      <mesh
+        position={[0, 0.025, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <ringGeometry args={[18.05, 19.35, 96]} />
+        <meshStandardMaterial color="#847766" roughness={0.98} />
+      </mesh>
+      <mesh
+        position={[0, 0.03, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <ringGeometry args={[4.12, 5.48, 64]} />
+        <meshStandardMaterial color="#8a7c69" roughness={0.98} />
+      </mesh>
+      {Array.from({ length: INNER_ROAD_COUNT }, (_, index) => {
+        const angle = ROAD_OFFSET + (index / INNER_ROAD_COUNT) * Math.PI * 2;
+        return (
+          <mesh
+            key={`road-${index}`}
+            position={[Math.cos(angle) * 11.75, 0.032, Math.sin(angle) * 11.75]}
+            rotation={[-Math.PI / 2, 0, -angle]}
+            receiveShadow
+          >
+            <planeGeometry args={[1.18, 13.9]} />
+            <meshStandardMaterial color="#8a7c69" roughness={0.98} />
+          </mesh>
+        );
+      })}
       <FloatingOutpost
         position={[25, 4.2, -10]}
         color="#ffd277"
@@ -2136,8 +2276,25 @@ export default function Home() {
                 : cur.social < 42
                   ? ["Discuss"]
                   : ["Explore", "Gather", "Research", "Build", "Discuss"];
-            const action = actions[Math.floor(Math.random() * actions.length)],
-              t = TARGETS[Math.floor(Math.random() * TARGETS.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const occupied = new Set(
+              old
+                .filter((_, index) => index !== idx)
+                .map(
+                  (person) =>
+                    `${person.target[0].toFixed(2)}:${person.target[2].toFixed(2)}`,
+                ),
+            );
+            const availableTargets = TARGETS.filter(
+              (candidate) =>
+                !occupied.has(
+                  `${candidate[0].toFixed(2)}:${candidate[2].toFixed(2)}`,
+                ),
+            );
+            const t =
+              availableTargets[
+                Math.floor(Math.random() * availableTargets.length)
+              ] || TARGETS[Math.floor(Math.random() * TARGETS.length)];
             const thoughts: Record<Action, string> = {
               Explore: "Another lab may have a reusable dataset.",
               Gather: "Secure the compute and samples the team needs most.",
@@ -2190,10 +2347,22 @@ export default function Home() {
               : `${a.name} and ${b.name} reached a new consensus and agreed to share replication results`;
             const memory = `${formatTime(next)} — discussed with ${b.name}: ${topic}`;
             const delta = conflict ? -2 : 3;
-            const meeting: [number, number, number] = [
-              TARGETS[(first + second) % TARGETS.length][0],
+            const meetingNode =
+              TARGETS[
+                (Math.floor(next / 10) + first + second) % TARGETS.length
+              ];
+            const radius = Math.hypot(meetingNode[0], meetingNode[2]);
+            const tangentX = radius > 0.1 ? -meetingNode[2] / radius : 1;
+            const tangentZ = radius > 0.1 ? meetingNode[0] / radius : 0;
+            const firstMeeting: [number, number, number] = [
+              meetingNode[0] + tangentX * 0.68,
               0,
-              TARGETS[(first + second) % TARGETS.length][2],
+              meetingNode[2] + tangentZ * 0.68,
+            ];
+            const secondMeeting: [number, number, number] = [
+              meetingNode[0] - tangentX * 0.68,
+              0,
+              meetingNode[2] - tangentZ * 0.68,
             ];
             addEvent(`${outcome}｜${topic}`, "talk", next);
             return old.map((person, index) => {
@@ -2202,14 +2371,7 @@ export default function Home() {
               return {
                 ...person,
                 action: "Discuss",
-                target:
-                  index === first
-                    ? meeting
-                    : ([meeting[0] + 0.8, 0, meeting[2] + 0.6] as [
-                        number,
-                        number,
-                        number,
-                      ]),
+                target: index === first ? firstMeeting : secondMeeting,
                 speech:
                   index === first
                     ? `From a ${person.skills[0]} perspective, I want to test: ${topic}`
