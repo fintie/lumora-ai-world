@@ -191,6 +191,117 @@
   }
 }
 
+/* Poetic storybook world: airy indigo glass, warm starlight and unobstructed play. */
+:root {
+  --story-ink: #191b35;
+  --story-indigo: #27294d;
+  --story-gold: #f0c978;
+  --story-cream: #fff8e8;
+  --story-mist: #dae8e4;
+}
+body {
+  background:
+    radial-gradient(circle at 18% 12%, #ece3ff 0, transparent 31%),
+    linear-gradient(145deg, #d7e9e8 0%, #f7efd9 52%, #dedcf1 100%);
+  color: var(--story-ink);
+}
+.app-shell {
+  background: linear-gradient(180deg, #f6f1e9e8, #dfece8e0);
+}
+.topbar {
+  border-bottom-color: #6f698b4d;
+  background: #171a35eb;
+  box-shadow: 0 8px 28px #1b18334d;
+}
+.brand-mark,
+.brand b,
+.brand small {
+  color: var(--story-cream);
+}
+.metric-card,
+.town-drawer,
+.town-events {
+  border-color: #7e779652;
+  background: #fffaf0dc;
+  box-shadow: 0 10px 34px #3c385625;
+}
+.metric-card b,
+.panel-title,
+.person-copy strong,
+.agent-detail h2 {
+  color: #272844;
+}
+.world-panel {
+  border: 1px solid #f0c9788c;
+  border-radius: 22px;
+  background: #171a35;
+  box-shadow:
+    0 22px 52px #30324c45,
+    inset 0 0 0 1px #fff8d924;
+  overflow: hidden;
+}
+.world-panel::after {
+  background:
+    radial-gradient(circle at 50% 15%, transparent 28%, #12152d17 68%),
+    linear-gradient(180deg, #11142a12, transparent 50%, #0b0d2057);
+  pointer-events: none;
+}
+.town-ui-tools {
+  border-color: #f1d28e70;
+  border-radius: 14px;
+  background: #171a35c9;
+  box-shadow: 0 10px 28px #0b0d1f42;
+}
+.town-ui-tools button {
+  border-radius: 10px;
+  color: #f6f0df;
+}
+.town-ui-tools button:hover,
+.town-ui-tools button.active {
+  border-color: #f3cf7c;
+  background: #5d4d78a6;
+  color: #fff0b7;
+}
+.world-label {
+  border: 1px solid #f1d7969c !important;
+  border-radius: 999px;
+  background: #1b1d3bc9;
+  color: #fff5d3;
+  box-shadow: 0 4px 16px #10112661;
+  backdrop-filter: blur(8px);
+}
+.agent-bubble {
+  border-color: #f0d089;
+  border-radius: 14px;
+  background: #fff9eede;
+  color: #24243e;
+  box-shadow: 0 8px 22px #22233d35;
+}
+.bottom-bar,
+footer {
+  border-color: #7c789443;
+  background: #f7f1e6d9;
+  color: #504f68;
+}
+.primary-button,
+.speed-button.active {
+  border-color: #d6af5b;
+  background: linear-gradient(145deg, #5e527d, #343653);
+  color: #fff8df;
+}
+
+@media (max-width: 760px) {
+  .world-panel {
+    border-radius: 16px;
+  }
+  .town-ui-tools {
+    top: 8px;
+    right: 8px;
+    max-width: calc(100% - 16px);
+    overflow-x: auto;
+  }
+}
+
 .growth-stat em {
   background: linear-gradient(90deg, #d5a749, #65a97e);
 }
