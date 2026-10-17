@@ -191,6 +191,452 @@
   }
 }
 
+/* Storybook exploration interface — an original Lumora constellation HUD. */
+.app-shell {
+  grid-template-rows: 58px 0 minmax(680px, 1fr) 0 0;
+  min-height: 100svh;
+  background: #11142b;
+}
+.topbar {
+  z-index: 60;
+  margin: 0;
+  padding: 0 20px;
+  border: 0;
+  background: linear-gradient(180deg, #11142bf5, #171a35e8);
+}
+.brand-mark {
+  position: relative;
+  border: 1px solid #f4d88b80;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe7a82b, transparent 70%);
+}
+.brand-mark::after {
+  position: absolute;
+  inset: -5px;
+  border: 1px solid #e7cf8d3d;
+  border-radius: 50%;
+  content: "";
+}
+.brand b {
+  letter-spacing: 0.24em;
+}
+.brand small {
+  opacity: 0.66;
+  letter-spacing: 0.08em;
+}
+.world-status {
+  border: 1px solid #eee1b924;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: #ffffff0a;
+}
+.header-actions .icon-button,
+.header-actions .primary {
+  border-color: #eed18b42;
+  background: #fff8df0b;
+  color: #fff5d6;
+}
+.metric-strip {
+  display: none;
+}
+.workspace {
+  min-height: 680px;
+  padding: 0;
+}
+.world-panel {
+  min-height: 680px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.world-panel::before {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 44%, transparent 45%, #090b2036 82%),
+    linear-gradient(
+      180deg,
+      #0f12334d 0,
+      transparent 18%,
+      transparent 74%,
+      #0c0e27a8 100%
+    );
+  content: "";
+  pointer-events: none;
+}
+.scene-title {
+  top: 24px;
+  left: 28px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #fff8df;
+}
+.scene-title span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+}
+.scene-title small {
+  color: #e6d69c;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.chapter-mark {
+  position: absolute;
+  z-index: 8;
+  top: 23px;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  transform: translateX(-50%);
+  color: #fff8df;
+  text-align: center;
+  text-shadow: 0 2px 14px #07081a;
+  pointer-events: none;
+}
+.chapter-mark::before,
+.chapter-mark::after {
+  position: absolute;
+  top: 17px;
+  width: 72px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f4d98c8f);
+  content: "";
+}
+.chapter-mark::before {
+  right: calc(100% + 14px);
+}
+.chapter-mark::after {
+  left: calc(100% + 14px);
+  transform: scaleX(-1);
+}
+.chapter-mark span {
+  color: #f3d789;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+}
+.chapter-mark b {
+  margin: 4px 0 2px;
+  font:
+    500 18px/1.1 Georgia,
+    "Times New Roman",
+    serif;
+}
+.chapter-mark small {
+  opacity: 0.7;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.guiding-quest {
+  position: absolute;
+  z-index: 8;
+  top: 94px;
+  left: 28px;
+  width: 232px;
+  padding: 15px 16px;
+  border: 1px solid #f3daa25c;
+  border-radius: 6px 18px 18px 18px;
+  background: linear-gradient(145deg, #171a35db, #292747c7);
+  box-shadow: 0 16px 40px #090a1d4d;
+  color: #f9f2df;
+  backdrop-filter: blur(14px) saturate(125%);
+}
+.quest-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: #edce78;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+}
+.guiding-quest strong {
+  display: block;
+  font:
+    500 16px/1.25 Georgia,
+    "Times New Roman",
+    serif;
+}
+.guiding-quest p {
+  margin: 7px 0 11px;
+  color: #dfdccf;
+  font-size: 10px;
+  line-height: 1.55;
+}
+.quest-progress {
+  height: 3px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #ffffff17;
+}
+.quest-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d89d5d, #ffe69b);
+  box-shadow: 0 0 10px #ffd270;
+}
+.guiding-quest > small {
+  display: block;
+  margin-top: 7px;
+  color: #c3bea9;
+  font-size: 9px;
+}
+.agent-whisper {
+  position: absolute;
+  z-index: 9;
+  bottom: 78px;
+  left: 28px;
+  display: flex;
+  width: min(330px, calc(100% - 56px));
+  gap: 11px;
+  align-items: center;
+  padding: 10px 13px;
+  border: 1px solid #f0d58c4f;
+  border-radius: 24px 10px 10px 24px;
+  background: #171a35d6;
+  box-shadow: 0 12px 32px #07081b52;
+  color: #fff8e4;
+  text-align: left;
+  backdrop-filter: blur(14px);
+  cursor: pointer;
+}
+.whisper-portrait {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #ffe5a989;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px #ffffff0b;
+  font:
+    600 15px Georgia,
+    serif;
+}
+.agent-whisper > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+.agent-whisper small {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #e7ca79;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.agent-whisper b {
+  margin: 2px 0;
+  font:
+    500 14px Georgia,
+    serif;
+}
+.agent-whisper em {
+  overflow: hidden;
+  color: #d8d5c9;
+  font-size: 9px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.constellation-lines {
+  position: absolute;
+  z-index: 5;
+  top: 98px;
+  right: 38px;
+  width: 115px;
+  height: 82px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.constellation-lines::before,
+.constellation-lines::after {
+  position: absolute;
+  width: 88px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ffe6a4, transparent);
+  content: "";
+  transform: rotate(24deg);
+}
+.constellation-lines::after {
+  top: 44px;
+  left: 20px;
+  transform: rotate(-34deg);
+}
+.constellation-lines i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff1b4;
+  box-shadow: 0 0 10px #ffe182;
+}
+.constellation-lines i:nth-child(1) {
+  left: 5px;
+  top: 2px;
+}
+.constellation-lines i:nth-child(2) {
+  left: 68px;
+  top: 28px;
+}
+.constellation-lines i:nth-child(3) {
+  left: 24px;
+  top: 62px;
+}
+.constellation-lines i:nth-child(4) {
+  right: 3px;
+  bottom: 4px;
+}
+.town-ui-tools {
+  top: 22px;
+  right: 24px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #151830b8;
+}
+.camera-tools,
+.speed-controls {
+  z-index: 10;
+  bottom: 20px;
+  border: 1px solid #f0d58b4a;
+  background: #171a35d6;
+  box-shadow: 0 12px 32px #07081b4d;
+  backdrop-filter: blur(14px);
+}
+.camera-tools {
+  left: 50%;
+  transform: translateX(-100%);
+  border-radius: 999px 0 0 999px;
+}
+.speed-controls {
+  right: 50%;
+  transform: translateX(100%);
+  border-left: 0;
+  border-radius: 0 999px 999px 0;
+}
+.camera-tools button,
+.speed-controls button {
+  color: #eee8d7;
+}
+.camera-tools button.active,
+.speed-controls button.active {
+  background: #f2d27b20;
+  color: #ffe79e;
+}
+.town-drawer {
+  top: 76px;
+  bottom: 82px;
+  border: 1px solid #eed28b57;
+  border-radius: 8px 22px 22px 22px;
+  background: linear-gradient(145deg, #fffaf0ed, #eee8dfdf);
+  box-shadow: 0 20px 52px #090a1e66;
+}
+.inspector-drawer {
+  border-radius: 22px 8px 22px 22px;
+}
+.town-events.open {
+  bottom: 78px;
+  border: 1px solid #eed28b57;
+  border-radius: 18px;
+  background: #fffaf0ed;
+}
+footer {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-rows: 52px 0 minmax(0, 1fr);
+  }
+  .topbar {
+    padding: 0 10px;
+  }
+  .brand small,
+  .world-status b,
+  .world-status .weather,
+  .header-actions .icon-button {
+    display: none;
+  }
+  .world-status {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+  .header-actions .primary {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+  .workspace,
+  .world-panel {
+    min-height: calc(100svh - 52px);
+    height: calc(100svh - 52px);
+  }
+  .world-panel {
+    border-radius: 0;
+  }
+  .scene-title {
+    top: 14px;
+    left: 12px;
+  }
+  .scene-title span {
+    font-size: 13px;
+  }
+  .scene-title small,
+  .chapter-mark small,
+  .guiding-quest,
+  .constellation-lines {
+    display: none;
+  }
+  .chapter-mark {
+    top: 14px;
+  }
+  .chapter-mark b {
+    font-size: 14px;
+  }
+  .chapter-mark::before,
+  .chapter-mark::after {
+    display: none;
+  }
+  .town-ui-tools {
+    top: 10px;
+    right: 8px;
+  }
+  .agent-whisper {
+    bottom: 70px;
+    left: 10px;
+    width: calc(100% - 20px);
+    padding: 8px 10px;
+  }
+  .whisper-portrait {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+  .camera-tools {
+    left: 10px;
+    transform: none;
+  }
+  .speed-controls {
+    right: 10px;
+    transform: none;
+    border-left: 1px solid #f0d58b4a;
+    border-radius: 999px;
+  }
+  .town-drawer {
+    bottom: 10px;
+    max-height: 72svh;
+    border-radius: 18px;
+  }
+  .town-events.open {
+    bottom: 10px;
+  }
+}
+
 /* Poetic storybook world: airy indigo glass, warm starlight and unobstructed play. */
 :root {
   --story-ink: #191b35;
@@ -990,5 +1436,50 @@ footer {
     bottom: 8px;
     left: 8px;
     max-height: 45svh;
+  }
+}
+
+/* Keep the constellation layout authoritative after legacy responsive layers. */
+.app-shell {
+  grid-template-rows: 58px 0 minmax(680px, 1fr) 0 0;
+  min-height: 100svh;
+}
+.metric-strip,
+footer {
+  display: none;
+}
+.workspace {
+  min-height: 680px;
+  padding: 0;
+}
+.world-panel {
+  height: 100%;
+  min-height: 680px;
+  border-radius: 0;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-rows: 52px 0 minmax(0, 1fr);
+  }
+  .workspace,
+  .world-panel {
+    min-height: calc(100svh - 52px);
+    height: calc(100svh - 52px);
+    max-height: none;
+  }
+  .workspace {
+    padding: 0;
+  }
+  .world-panel {
+    border-radius: 0;
+  }
+  .town-drawer {
+    bottom: 10px;
+    max-height: 72svh;
+  }
+  .town-events {
+    bottom: 10px;
+    max-height: 58svh;
   }
 }
