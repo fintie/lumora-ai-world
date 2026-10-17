@@ -819,6 +819,101 @@ function ReflectionGarden() {
     </group>
   );
 }
+function FloatingOutpost({
+  position,
+  color,
+  label,
+}: {
+  position: [number, number, number];
+  color: string;
+  label: string;
+}) {
+  return (
+    <group position={position} scale={0.82}>
+      <mesh position={[0, -0.55, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[4.6, 3.8, 1.1, 18]} />
+        <meshStandardMaterial color="#476453" roughness={1} />
+      </mesh>
+      <mesh position={[0, -3.15, 0]} castShadow>
+        <coneGeometry args={[3.8, 5.2, 16]} />
+        <meshStandardMaterial color="#4b4d5d" roughness={0.92} />
+      </mesh>
+      <mesh position={[0, 1.15, 0]} castShadow>
+        <boxGeometry args={[3.7, 2.3, 2.5]} />
+        <meshStandardMaterial color="#916e4e" roughness={0.88} />
+      </mesh>
+      <mesh position={[0, 3.05, 0]} castShadow>
+        <boxGeometry args={[1.25, 2, 1.3]} />
+        <meshStandardMaterial color="#a17a52" roughness={0.88} />
+      </mesh>
+      <mesh position={[0, 4.45, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+        <coneGeometry args={[1, 1.4, 4]} />
+        <meshStandardMaterial color="#343442" metalness={0.25} />
+      </mesh>
+      {[-1.15, 0, 1.15].map((x) => (
+        <mesh key={x} position={[x, 1.25, 1.27]}>
+          <boxGeometry args={[0.5, 0.72, 0.06]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={2.4}
+          />
+        </mesh>
+      ))}
+      <pointLight
+        position={[0, 2.2, 1.8]}
+        color={color}
+        intensity={3}
+        distance={10}
+      />
+      <Tree x={-2.5} z={0.8} s={0.72} />
+      <Tree x={2.45} z={-0.65} s={0.78} />
+      <WorldLabel position={[0, 5.6, 0]} color={color}>
+        {label}
+      </WorldLabel>
+    </group>
+  );
+}
+function WaterGarden() {
+  return (
+    <group position={[-5.8, 0, 13.4]}>
+      <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[2.6, 36]} />
+        <meshStandardMaterial
+          color="#2f7181"
+          emissive="#17465c"
+          emissiveIntensity={0.38}
+          metalness={0.2}
+          roughness={0.22}
+        />
+      </mesh>
+      <mesh position={[0, 0.07, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[2.55, 2.9, 36]} />
+        <meshStandardMaterial color="#a18b6d" roughness={0.95} />
+      </mesh>
+      <mesh position={[0, -1.55, 2.55]} rotation={[0, 0, 0]}>
+        <planeGeometry args={[2.25, 3.2, 8, 12]} />
+        <meshStandardMaterial
+          color="#86d8e9"
+          emissive="#3c91ae"
+          emissiveIntensity={0.8}
+          transparent
+          opacity={0.72}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {[-0.9, -0.45, 0, 0.45, 0.9].map((x, i) => (
+        <mesh key={x} position={[x, -3.15 - (i % 2) * 0.25, 2.62]}>
+          <sphereGeometry args={[0.08, 8, 8]} />
+          <meshBasicMaterial color="#b8f3ff" transparent opacity={0.8} />
+        </mesh>
+      ))}
+      <WorldLabel position={[0, 1.05, -0.2]} color="#9eeaff">
+        Cloudfall Garden
+      </WorldLabel>
+    </group>
+  );
+}
 function Jacaranda({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 0, z]}>
@@ -1612,6 +1707,38 @@ function Scene({
           roughness={0.95}
         />
       </mesh>
+      <FloatingOutpost
+        position={[25, 4.2, -10]}
+        color="#ffd277"
+        label="Astral Systems Annex"
+      />
+      <FloatingOutpost
+        position={[-24, 6.2, -12]}
+        color="#a7c8ff"
+        label="Sky Archive"
+      />
+      <mesh
+        position={[20.2, 2.15, -8.4]}
+        rotation={[0, -0.42, 0.32]}
+        castShadow
+        receiveShadow
+      >
+        <boxGeometry args={[10.5, 0.34, 1.35]} />
+        <meshStandardMaterial color="#938069" roughness={0.92} />
+      </mesh>
+      {[-3.8, -1.8, 0.2, 2.2, 4.2].map((offset) => (
+        <mesh
+          key={offset}
+          position={[
+            20.2 + offset * 0.9,
+            2.55 + offset * 0.28,
+            -8.4 - offset * 0.38,
+          ]}
+        >
+          <boxGeometry args={[0.1, 0.9, 1.65]} />
+          <meshStandardMaterial color="#6e5d50" />
+        </mesh>
+      ))}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[22, 64]} />
         <meshStandardMaterial
@@ -1677,6 +1804,7 @@ function Scene({
       <Jacaranda x={-4.6} z={0.8} />
       <Jacaranda x={4.7} z={0.5} />
       <ReflectionGarden />
+      <WaterGarden />
       {[
         [-5.5, -1.3],
         [-2.8, -1.3],
@@ -1684,6 +1812,12 @@ function Scene({
         [5.5, -1.3],
         [-0.7, 4.8],
         [0.7, 7.1],
+        [-8.5, 11.5],
+        [-3.8, 12.8],
+        [4.2, 12.8],
+        [8.8, 10.5],
+        [-12, -4.5],
+        [12, -4.2],
       ].map(([x, z], i) => (
         <StoryLantern key={`lantern-${i}`} x={x} z={z} />
       ))}
@@ -1734,24 +1868,47 @@ function Scene({
         Quadrangle Lawn · Commons
       </WorldLabel>
       <group position={[0, 0, 0]}>
-        <mesh position={[0, 0.18, 0]}>
-          <cylinderGeometry args={[1.1, 1.25, 0.28, 12]} />
-          <meshStandardMaterial color="#73685b" />
-        </mesh>
-        <pointLight
-          position={[0, 1, 0]}
-          color="#ffad55"
-          intensity={3}
-          distance={8}
-        />
-        <mesh position={[0, 0.7, 0]}>
-          <coneGeometry args={[0.45, 1.4, 7]} />
+        <mesh position={[0, 0.36, 0]} castShadow>
+          <cylinderGeometry args={[1.75, 1.9, 0.72, 20]} />
           <meshStandardMaterial
-            color="#ff9b45"
-            emissive="#ff652f"
-            emissiveIntensity={1.8}
+            color="#6f6258"
+            metalness={0.18}
+            roughness={0.7}
           />
         </mesh>
+        <pointLight
+          position={[0, 1.3, 0]}
+          color="#ffc962"
+          intensity={4.2}
+          distance={11}
+        />
+        <mesh position={[0, 1.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.92, 0.055, 10, 40]} />
+          <meshStandardMaterial
+            color="#ffe29a"
+            emissive="#ffbd45"
+            emissiveIntensity={3}
+          />
+        </mesh>
+        <mesh position={[0, 1.05, 0]} rotation={[0.7, 0.2, 0.4]}>
+          <torusGeometry args={[0.7, 0.035, 8, 32]} />
+          <meshStandardMaterial
+            color="#8ee8ff"
+            emissive="#45bde8"
+            emissiveIntensity={2.5}
+          />
+        </mesh>
+        <mesh position={[0, 1.05, 0]}>
+          <sphereGeometry args={[0.22, 18, 18]} />
+          <meshStandardMaterial
+            color="#fff2b9"
+            emissive="#ffc756"
+            emissiveIntensity={4}
+          />
+        </mesh>
+        <WorldLabel position={[0, 2.15, 0]} color="#ffe09a">
+          Lumora Collaboration Table
+        </WorldLabel>
       </group>
       <group position={expansionPosition(completed)}>
         <mesh position={[0, 0.08, 0]}>
