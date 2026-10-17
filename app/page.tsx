@@ -645,29 +645,27 @@ const START_EVENTS: EventItem[] = [
     text: "The morning compute window opened and training capacity recovered",
   },
 ];
-const OUTER_ROAD_COUNT = 16;
-const INNER_ROAD_COUNT = 8;
-const ROAD_OFFSET = Math.PI / 8;
-const OUTER_ROAD_RADIUS = 17.3;
-const INNER_ROAD_RADIUS = 4.8;
-const ROAD_NODES: [number, number, number][] = [
-  ...Array.from({ length: OUTER_ROAD_COUNT }, (_, index) => {
-    const angle = ROAD_OFFSET + (index / OUTER_ROAD_COUNT) * Math.PI * 2;
-    return [
-      Math.cos(angle) * OUTER_ROAD_RADIUS,
-      0,
-      Math.sin(angle) * OUTER_ROAD_RADIUS,
-    ] as [number, number, number];
-  }),
-  ...Array.from({ length: INNER_ROAD_COUNT }, (_, index) => {
-    const angle = ROAD_OFFSET + (index / INNER_ROAD_COUNT) * Math.PI * 2;
-    return [
-      Math.cos(angle) * INNER_ROAD_RADIUS,
-      0,
-      Math.sin(angle) * INNER_ROAD_RADIUS,
-    ] as [number, number, number];
-  }),
-  [0, 0, 0] as [number, number, number],
+// A compressed, walkable interpretation of the Camperdown/Darlington campus.
+// Columns follow Western Avenue, the Quadrangle/Fisher axis, Eastern Avenue and
+// the Victoria Park edge; rows follow the northern, Science Road and southern axes.
+const CAMPUS_X = [-17, -7, 3, 10, 17];
+const CAMPUS_Z = [-13, -4, 5, 14];
+const ROAD_NODES: [number, number, number][] = CAMPUS_Z.flatMap((z) =>
+  CAMPUS_X.map((x) => [x, 0, z] as [number, number, number]),
+);
+const ROAD_EDGES: [number, number][] = [
+  ...CAMPUS_Z.flatMap((_, row) =>
+    CAMPUS_X.slice(0, -1).map((__, column) => [
+      row * CAMPUS_X.length + column,
+      row * CAMPUS_X.length + column + 1,
+    ] as [number, number]),
+  ),
+  ...CAMPUS_X.flatMap((_, column) =>
+    CAMPUS_Z.slice(0, -1).map((__, row) => [
+      row * CAMPUS_X.length + column,
+      (row + 1) * CAMPUS_X.length + column,
+    ] as [number, number]),
+  ),
 ];
 const TARGETS = ROAD_NODES;
 
@@ -675,85 +673,47 @@ const ACTIVITY_VENUES = [
   {
     name: "Generative AI Lab",
     kind: "Research",
-    angle: 0,
-    radius: 10.6,
-    tangent: -1.8,
+    host: "Carslaw Building",
+    position: [7.2, 0, 3.7] as [number, number, number],
+    entrance: [10, 0, 5] as [number, number, number],
     color: "#82e3dc",
   },
   {
     name: "Web3 Protocol Lab",
     kind: "Research",
-    angle: Math.PI / 4,
-    radius: 11.3,
-    tangent: 1.1,
+    host: "Engineering Precinct",
+    position: [-10.8, 0, 12.6] as [number, number, number],
+    entrance: [-7, 0, 14] as [number, number, number],
     color: "#b99cff",
-  },
-  {
-    name: "Robotics Workshop",
-    kind: "Build",
-    angle: Math.PI / 2,
-    radius: 10.3,
-    tangent: 1.7,
-    color: "#ffb172",
   },
   {
     name: "Creator Studio",
     kind: "Work",
-    angle: (Math.PI * 3) / 4,
-    radius: 11.8,
-    tangent: -1.25,
+    host: "Abercrombie Building",
+    position: [-0.5, 0, 12.6] as [number, number, number],
+    entrance: [3, 0, 14] as [number, number, number],
     color: "#79c8ef",
-  },
-  {
-    name: "Project Demo Pavilion",
-    kind: "Explore",
-    angle: Math.PI,
-    radius: 10.5,
-    tangent: 1.55,
-    color: "#ffd36f",
   },
   {
     name: "Team Conference Room",
     kind: "Discuss",
-    angle: (Math.PI * 5) / 4,
-    radius: 8.9,
-    tangent: -1.35,
+    host: "Fisher Library",
+    position: [0.8, 0, -5.7] as [number, number, number],
+    entrance: [3, 0, -4] as [number, number, number],
     color: "#8fe0ac",
-  },
-  {
-    name: "Data & Simulation Lab",
-    kind: "Research",
-    angle: (Math.PI * 3) / 2,
-    radius: 12.2,
-    tangent: 0,
-    color: "#8caaff",
-  },
-  {
-    name: "Strategy Meeting Room",
-    kind: "Discuss",
-    angle: (Math.PI * 7) / 4,
-    radius: 11.5,
-    tangent: -1.45,
-    color: "#f49ab4",
   },
 ] as const;
 
 function venuePosition(
   venue: (typeof ACTIVITY_VENUES)[number],
 ): [number, number, number] {
-  return [
-    Math.cos(venue.angle) * venue.radius -
-      Math.sin(venue.angle) * venue.tangent,
-    0,
-    Math.sin(venue.angle) * venue.radius +
-      Math.cos(venue.angle) * venue.tangent,
-  ];
+  return venue.position;
 }
 
 function venueEntrance(
   venue: (typeof ACTIVITY_VENUES)[number],
 ): [number, number, number] {
-  return [Math.cos(venue.angle) * 14.05, 0, Math.sin(venue.angle) * 14.05];
+  return venue.entrance;
 }
 
 function purposefulDestination(action: Action, id: string) {
@@ -767,8 +727,8 @@ function purposefulDestination(action: Action, id: string) {
   const venue = pool[seed % pool.length];
   const entrance = venueEntrance(venue);
   const berth = (Math.floor(seed / Math.max(1, pool.length)) % 5) - 2;
-  const tangentX = -Math.sin(venue.angle);
-  const tangentZ = Math.cos(venue.angle);
+  const tangentX = 1;
+  const tangentZ = 0;
   return {
     target: [
       entrance[0] + tangentX * berth * 0.72,
@@ -780,26 +740,8 @@ function purposefulDestination(action: Action, id: string) {
 }
 
 function roadNeighbours(index: number): number[] {
-  if (index < OUTER_ROAD_COUNT) {
-    const neighbours = [
-      (index - 1 + OUTER_ROAD_COUNT) % OUTER_ROAD_COUNT,
-      (index + 1) % OUTER_ROAD_COUNT,
-    ];
-    if (index % 2 === 0) neighbours.push(OUTER_ROAD_COUNT + index / 2);
-    return neighbours;
-  }
-  if (index < OUTER_ROAD_COUNT + INNER_ROAD_COUNT) {
-    const inner = index - OUTER_ROAD_COUNT;
-    return [
-      OUTER_ROAD_COUNT + ((inner - 1 + INNER_ROAD_COUNT) % INNER_ROAD_COUNT),
-      OUTER_ROAD_COUNT + ((inner + 1) % INNER_ROAD_COUNT),
-      inner * 2,
-      OUTER_ROAD_COUNT + INNER_ROAD_COUNT,
-    ];
-  }
-  return Array.from(
-    { length: INNER_ROAD_COUNT },
-    (_, inner) => OUTER_ROAD_COUNT + inner,
+  return ROAD_EDGES.flatMap(([from, to]) =>
+    from === index ? [to] : to === index ? [from] : [],
   );
 }
 
@@ -823,54 +765,22 @@ function buildRoadRoute(
 ): THREE.Vector3[] {
   const start = closestRoadNode(from);
   const finish = closestRoadNode(destination);
-  let indexes: number[] = [];
-  if (finish < OUTER_ROAD_COUNT) {
-    const startOuter =
-      start < OUTER_ROAD_COUNT
-        ? start
-        : start < OUTER_ROAD_COUNT + INNER_ROAD_COUNT
-          ? (start - OUTER_ROAD_COUNT) * 2
-          : 0;
-    const clockwise = [startOuter];
-    const counterClockwise = [startOuter];
-    while (clockwise.at(-1) !== finish) {
-      clockwise.push((clockwise.at(-1)! + 1) % OUTER_ROAD_COUNT);
-    }
-    while (counterClockwise.at(-1) !== finish) {
-      counterClockwise.push(
-        (counterClockwise.at(-1)! - 1 + OUTER_ROAD_COUNT) % OUTER_ROAD_COUNT,
-      );
-    }
-    const prefix =
-      start === startOuter
-        ? []
-        : start < OUTER_ROAD_COUNT + INNER_ROAD_COUNT
-          ? [start]
-          : [start, OUTER_ROAD_COUNT];
-    indexes = [
-      ...prefix,
-      ...(clockwise.length <= counterClockwise.length
-        ? clockwise
-        : counterClockwise),
-    ];
-  } else {
-    const queue = [start];
-    const previous = new Map<number, number>();
-    const visited = new Set([start]);
-    while (queue.length) {
-      const current = queue.shift()!;
-      if (current === finish) break;
-      roadNeighbours(current).forEach((next) => {
-        if (visited.has(next)) return;
-        visited.add(next);
-        previous.set(next, current);
-        queue.push(next);
-      });
-    }
-    indexes = [finish];
-    while (indexes[0] !== start && previous.has(indexes[0])) {
-      indexes.unshift(previous.get(indexes[0])!);
-    }
+  const queue = [start];
+  const previous = new Map<number, number>();
+  const visited = new Set([start]);
+  while (queue.length) {
+    const current = queue.shift()!;
+    if (current === finish) break;
+    roadNeighbours(current).forEach((next) => {
+      if (visited.has(next)) return;
+      visited.add(next);
+      previous.set(next, current);
+      queue.push(next);
+    });
+  }
+  const indexes = [finish];
+  while (indexes[0] !== start && previous.has(indexes[0])) {
+    indexes.unshift(previous.get(indexes[0])!);
   }
   const route = indexes.map(
     (index) =>
@@ -1543,72 +1453,59 @@ function Classroom({
 
 function ActivityVenue({ venue }: { venue: (typeof ACTIVITY_VENUES)[number] }) {
   const [x, , z] = venuePosition(venue);
-  const rotation = -venue.angle + Math.PI / 2;
-  const isDemo = venue.name.includes("Demo");
-  const isMeeting = venue.kind === "Discuss";
   return (
-    <group position={[x, 0, z]} rotation={[0, rotation, 0]}>
+    <group position={[x, 0, z]}>
       <RoundedBox
-        args={[4.4, isDemo ? 1.8 : 2.35, 3.1]}
-        radius={0.18}
+        args={[1.5, 0.72, 0.42]}
+        radius={0.09}
         smoothness={5}
-        position={[0, isDemo ? 0.9 : 1.175, 0]}
+        position={[0, 0.5, 0]}
         castShadow
-        receiveShadow
       >
         <meshStandardMaterial
-          color={isMeeting ? "#4d554c" : "#3f4948"}
-          roughness={0.62}
-          metalness={0.14}
+          color="#25332f"
+          roughness={0.7}
+          metalness={0.1}
         />
       </RoundedBox>
-      <mesh position={[0, 1.15, 1.57]}>
-        <planeGeometry args={[3.35, 1.12]} />
+      <mesh position={[0, 0.5, 0.22]}>
+        <planeGeometry args={[1.18, 0.38]} />
         <meshStandardMaterial
           color={venue.color}
           emissive={venue.color}
-          emissiveIntensity={0.9}
-          transparent
-          opacity={0.82}
+          emissiveIntensity={0.75}
         />
       </mesh>
-      <mesh position={[0, 0.58, 1.64]}>
-        <boxGeometry args={[0.72, 1.16, 0.12]} />
-        <meshStandardMaterial color="#17201f" roughness={0.8} />
-      </mesh>
-      {isMeeting &&
-        [-1.1, 0, 1.1].map((offset) => (
-          <mesh key={offset} position={[offset, 0.5, 0.25]}>
-            <cylinderGeometry args={[0.34, 0.4, 0.12, 16]} />
-            <meshStandardMaterial color="#bba774" roughness={0.8} />
-          </mesh>
-        ))}
-      {isDemo && (
-        <group position={[0, 1.5, 0]}>
-          <mesh>
-            <boxGeometry args={[2.5, 1.2, 0.16]} />
-            <meshStandardMaterial
-              color="#19262a"
-              emissive={venue.color}
-              emissiveIntensity={0.45}
-            />
-          </mesh>
-          <mesh position={[0, -0.75, 0.3]}>
-            <boxGeometry args={[2.9, 0.18, 1.25]} />
-            <meshStandardMaterial color="#77684f" />
-          </mesh>
-        </group>
-      )}
       <pointLight
-        position={[0, 1.6, 2.5]}
+        position={[0, 1.1, 0.5]}
         color={venue.color}
-        intensity={2.2}
-        distance={7}
+        intensity={1.1}
+        distance={3.5}
       />
-      <WorldLabel position={[0, 3.35, 0]} color={venue.color}>
-        {venue.name}
+      <WorldLabel position={[0, 1.55, 0]} color={venue.color}>
+        {venue.name} · {venue.host}
       </WorldLabel>
     </group>
+  );
+}
+
+function CampusPath({ from, to, width = 1.05 }: {
+  from: [number, number, number];
+  to: [number, number, number];
+  width?: number;
+}) {
+  const dx = to[0] - from[0];
+  const dz = to[2] - from[2];
+  const length = Math.hypot(dx, dz);
+  return (
+    <mesh
+      position={[(from[0] + to[0]) / 2, 0.035, (from[2] + to[2]) / 2]}
+      rotation={[0, Math.atan2(dx, dz), 0]}
+      receiveShadow
+    >
+      <boxGeometry args={[width, 0.055, length]} />
+      <meshStandardMaterial color="#a2947f" roughness={0.98} />
+    </mesh>
   );
 }
 function GrowthBuilding({
@@ -2084,36 +1981,6 @@ function Scene({
           roughness={0.95}
         />
       </mesh>
-      <mesh
-        position={[0, 0.025, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow
-      >
-        <ringGeometry args={[16.62, 17.98, 96]} />
-        <meshStandardMaterial color="#847766" roughness={0.98} />
-      </mesh>
-      <mesh
-        position={[0, 0.03, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow
-      >
-        <ringGeometry args={[4.12, 5.48, 64]} />
-        <meshStandardMaterial color="#8a7c69" roughness={0.98} />
-      </mesh>
-      {Array.from({ length: INNER_ROAD_COUNT }, (_, index) => {
-        const angle = ROAD_OFFSET + (index / INNER_ROAD_COUNT) * Math.PI * 2;
-        return (
-          <mesh
-            key={`road-${index}`}
-            position={[Math.cos(angle) * 11.05, 0.032, Math.sin(angle) * 11.05]}
-            rotation={[0, -angle + Math.PI / 2, 0]}
-            receiveShadow
-          >
-            <boxGeometry args={[1.18, 0.055, 12.5]} />
-            <meshStandardMaterial color="#8a7c69" roughness={0.98} />
-          </mesh>
-        );
-      })}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[22, 64]} />
         <meshStandardMaterial
@@ -2121,112 +1988,56 @@ function Scene({
           roughness={1}
         />
       </mesh>
-      {ACTIVITY_VENUES.map((venue) => {
-        const drivewayRadius = 15.68;
-        const entrance = venueEntrance(venue);
-        const building = venuePosition(venue);
-        const pathX = entrance[0] - building[0];
-        const pathZ = entrance[2] - building[2];
-        const pathLength = Math.hypot(pathX, pathZ);
-        const pathRotation = Math.atan2(pathX, pathZ);
-        return (
-          <group key={venue.name}>
-            <mesh
-              position={[
-                Math.cos(venue.angle) * 14.05,
-                0.039,
-                Math.sin(venue.angle) * 14.05,
-              ]}
-              rotation={[-Math.PI / 2, 0, 0]}
-              receiveShadow
-            >
-              <circleGeometry args={[1.72, 32]} />
-              <meshStandardMaterial color="#80725f" roughness={0.98} />
-            </mesh>
-            <mesh
-              position={[
-                Math.cos(venue.angle) * drivewayRadius,
-                0.038,
-                Math.sin(venue.angle) * drivewayRadius,
-              ]}
-              rotation={[0, -venue.angle + Math.PI / 2, 0]}
-              receiveShadow
-            >
-              <boxGeometry args={[1.08, 0.06, 3.25]} />
-              <meshStandardMaterial color="#897964" roughness={0.98} />
-            </mesh>
-            <mesh
-              position={[
-                (entrance[0] + building[0]) / 2,
-                0.041,
-                (entrance[2] + building[2]) / 2,
-              ]}
-              rotation={[0, pathRotation, 0]}
-              receiveShadow
-            >
-              <boxGeometry args={[0.78, 0.045, pathLength]} />
-              <meshStandardMaterial color="#a29176" roughness={0.98} />
-            </mesh>
-            <ActivityVenue venue={venue} />
-          </group>
-        );
-      })}
-      {ACTIVITY_VENUES.map((venue) => {
-        const tangentX = -Math.sin(venue.angle) * 1.25;
-        const tangentZ = Math.cos(venue.angle) * 1.25;
-        return (
-          <group key={`garden-${venue.name}`}>
-            <StoryLantern
-              x={Math.cos(venue.angle) * 15.15 + tangentX}
-              z={Math.sin(venue.angle) * 15.15 + tangentZ}
-            />
-          </group>
-        );
-      })}
-      <mesh
-        position={[0, 0.026, 2.4]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow
-      >
-        <circleGeometry args={[3.45, 48]} />
-        <meshStandardMaterial color="#4f8057" roughness={1} />
+      {ROAD_EDGES.map(([from, to]) => (
+        <CampusPath
+          key={`campus-path-${from}-${to}`}
+          from={ROAD_NODES[from]}
+          to={ROAD_NODES[to]}
+          width={from % CAMPUS_X.length === 2 && to % CAMPUS_X.length === 2 ? 1.45 : 1.02}
+        />
+      ))}
+      <WorldLabel position={[-17, 0.55, -8.5]} color="#f1d49a">Western Avenue</WorldLabel>
+      <WorldLabel position={[3, 0.55, 0.5]} color="#f1d49a">Eastern Avenue</WorldLabel>
+      <WorldLabel position={[-2, 0.55, 5]} color="#e9d8b8">Science Road</WorldLabel>
+      <WorldLabel position={[0, 0.55, 14]} color="#e9d8b8">Darlington Walk</WorldLabel>
+      <GothicHall position={[-12, 0, -8.5]} />
+      <WorldLabel position={[-12, 4.9, -8.5]} color="#ffe0a3">The Quadrangle · Great Hall</WorldLabel>
+      <mesh position={[-12, 0.028, 0.3]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[7.1, 6.6]} />
+        <meshStandardMaterial color="#63855b" roughness={1} />
       </mesh>
-      <CampusBuilding
-        position={[0, 0, -7.4]}
-        size={[7.2, 3.05, 2.25]}
-        label="Main Quadrangle · School of AI"
-        color="#8a694d"
-        glow="#ffd58a"
-      />
-      <WorldLabel position={[0, 0.75, 3.2]} color="#d9efad">
-        University Lawn
-      </WorldLabel>
+      <WorldLabel position={[-12, 0.72, 0.2]} color="#e8efb5">Front Lawn</WorldLabel>
+      <CampusBuilding position={[-2, 0, -8.5]} size={[6.4, 3.2, 4.5]} label="Fisher Library" color="#a69a86" glow="#bde6d7" />
+      <CampusBuilding position={[6.5, 0, -8.5]} size={[5.4, 3.15, 4.4]} label="New Law Building" color="#817d79" glow="#d9e8ef" />
+      <CampusBuilding position={[-2, 0, 0.4]} size={[6.1, 2.8, 4.5]} label="Chemistry · Madsen" color="#9a7d64" glow="#f2c98c" />
+      <CampusBuilding position={[6.5, 0, 0.4]} size={[5.4, 3.3, 4.5]} label="Carslaw Building" color="#8e8a7d" glow="#9ee2da" />
+      <CampusBuilding position={[-12, 0, 9.5]} size={[7.1, 3.05, 4.5]} label="Engineering Precinct" color="#8a7665" glow="#bdadff" />
+      <CampusBuilding position={[-2, 0, 9.5]} size={[6.1, 3.25, 4.5]} label="Abercrombie Building" color="#92775e" glow="#86d2f3" />
+      <CampusBuilding position={[6.5, 0, 9.5]} size={[5.4, 2.75, 4.4]} label="Wentworth Building" color="#9a8069" glow="#ffd395" />
+      <CampusBuilding position={[13.5, 0, -8.5]} size={[5.1, 3.5, 4.4]} label="Chau Chak Wing Museum" color="#746d66" glow="#e9d5a5" />
+      <mesh position={[19.4, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[3.8, 27]} />
+        <meshStandardMaterial color="#557c59" roughness={1} />
+      </mesh>
+      <WorldLabel position={[19, 0.65, 0]} color="#d9efad">Victoria Park</WorldLabel>
+      {ACTIVITY_VENUES.map((venue) => <ActivityVenue key={venue.name} venue={venue} />)}
       {[
-        [-14.2, -5.8, 0.72],
-        [-14.1, 5.4, 0.78],
-        [-6.1, 14.1, 0.75],
-        [5.7, 14.2, 0.82],
-        [14.1, 5.8, 0.74],
-        [14.2, -5.5, 0.8],
-        [5.9, -15.1, 0.7],
-        [-6.2, -14.8, 0.76],
-        [-3.7, 5.8, 0.6],
-        [4.2, 6.2, 0.64],
+        [-19.3, -9.5, 0.72],
+        [-19.1, 9.4, 0.78],
+        [-14, 3, 0.68],
+        [-9.4, 2.7, 0.66],
+        [14.2, 2.8, 0.74],
+        [14.5, 10.7, 0.8],
+        [14.1, -1.8, 0.7],
+        [19.2, -11.6, 0.76],
+        [19.1, 11.8, 0.72],
       ].map(([x, z, scale], index) => (
         <Tree key={`campus-tree-${index}`} x={x} z={z} s={scale} />
       ))}
-      {Array.from({ length: completed }, (_, index) => (
-        <GrowthBuilding
-          key={`growth-${index}`}
-          project={PROJECTS[index % PROJECTS.length]}
-          index={index}
-          level={projectLevels[index] || 1}
-        />
-      ))}
-      <WorldLabel position={[0, 2.1, 0]} color="#ffe0a3">
+      <WorldLabel position={[13.5, 2.1, 0]} color="#ffe0a3">
         Campus Commons · Collaboration Plaza
       </WorldLabel>
-      <group position={[0, 0, 0]}>
+      <group position={[13.5, 0, 0]}>
         <mesh position={[0, 0.36, 0]} castShadow>
           <cylinderGeometry args={[1.75, 1.9, 0.72, 20]} />
           <meshStandardMaterial
@@ -2267,27 +2078,6 @@ function Scene({
         </mesh>
         <WorldLabel position={[0, 2.15, 0]} color="#ffe09a">
           Lumora Collaboration Table
-        </WorldLabel>
-      </group>
-      <group position={expansionPosition(completed)}>
-        <mesh position={[0, 0.08, 0]}>
-          <boxGeometry args={[3.5, 0.16, 3]} />
-          <meshStandardMaterial color="#82715f" />
-        </mesh>
-        {[
-          [-1.3, -1],
-          [1.3, -1],
-          [-1.3, 1],
-          [1.3, 1],
-        ].map((p, i) => (
-          <mesh key={i} position={[p[0], progress > 65 ? 1.1 : 0.65, p[1]]}>
-            <boxGeometry args={[0.16, progress > 65 ? 2.2 : 1.3, 0.16]} />
-            <meshStandardMaterial color="#d3a262" />
-          </mesh>
-        ))}
-        <WorldLabel position={[0, 2.5, 0]} color="#f7d873">
-          Building: {PROJECTS[completed % PROJECTS.length].name} ·{" "}
-          {Math.round(progress)}%
         </WorldLabel>
       </group>
       {agents.map((a, index) => (
