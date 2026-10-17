@@ -197,6 +197,9 @@
   min-height: 100svh;
   background: #11142b;
 }
+.workspace:not(:has(.town-drawer.open)) {
+  grid-template-columns: minmax(0, 1fr);
+}
 .topbar {
   z-index: 60;
   margin: 0;
@@ -1753,5 +1756,136 @@ footer {
   }
   .quest-guide {
     display: none;
+  }
+}
+
+/* Non-overlay layout: the world and readable character data never cover each other. */
+.guiding-quest,
+.agent-whisper,
+.constellation-lines {
+  display: none !important;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  align-items: stretch;
+  min-height: calc(100svh - 58px);
+  height: auto;
+  overflow: visible;
+  background: #11142b;
+}
+.world-panel {
+  grid-column: 1;
+  grid-row: 1;
+  height: calc(100svh - 58px);
+  min-height: 640px;
+}
+.town-drawer {
+  position: static !important;
+  inset: auto !important;
+  display: none;
+  width: 350px;
+  max-width: 100%;
+  height: calc(100svh - 58px);
+  max-height: none;
+  margin: 0;
+  overflow-y: auto !important;
+  border-width: 0 0 0 1px;
+  border-radius: 0;
+  opacity: 1;
+  visibility: visible;
+  transform: none !important;
+  pointer-events: auto;
+  box-shadow: none;
+}
+.town-drawer.open {
+  display: block;
+  grid-column: 2;
+  grid-row: 1;
+}
+.town-ui-tools {
+  top: 14px;
+  right: 14px;
+}
+.agent-bubble {
+  width: auto;
+  min-width: 82px;
+  padding: 4px 7px;
+  border: 1px solid #f0d58a80;
+  border-radius: 999px;
+  background: #171a35e8;
+  color: #fff4d0;
+  text-align: center;
+  box-shadow: 0 5px 12px #08091a3d;
+  pointer-events: none;
+}
+.agent-bubble strong {
+  display: block;
+  font-size: 8px;
+  white-space: nowrap;
+}
+.agent-bubble i {
+  display: block;
+  color: #dfc67e;
+  font-size: 7px;
+  font-style: normal;
+}
+.town-events,
+.town-events.open {
+  position: static;
+  display: none;
+  width: 100%;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #d3ccb84d;
+  border-radius: 0;
+  box-shadow: none;
+}
+.town-events.open {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  body {
+    overflow-y: auto;
+  }
+  .app-shell {
+    min-height: 100svh;
+    height: auto;
+  }
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 68svh auto;
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+  }
+  .world-panel {
+    grid-column: 1;
+    grid-row: 1;
+    height: 68svh;
+    min-height: 470px;
+  }
+  .town-drawer,
+  .town-drawer.open {
+    position: static !important;
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    overflow: visible !important;
+  }
+  .town-ui-tools {
+    top: 9px;
+    right: 9px;
+  }
+  .town-events.open {
+    position: static;
+    max-height: none;
   }
 }
