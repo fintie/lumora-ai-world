@@ -1830,6 +1830,20 @@ footer {
   font-size: 7px;
   font-style: normal;
 }
+.talk-indicator {
+  min-width: 29px;
+  padding: 2px 7px 4px;
+  border: 1px solid #f0d58a80;
+  border-radius: 999px;
+  background: #171a35df;
+  color: #ffe19a;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-align: center;
+  box-shadow: 0 4px 10px #08091a3d;
+  pointer-events: none;
+}
 .town-events,
 .town-events.open {
   position: static;
