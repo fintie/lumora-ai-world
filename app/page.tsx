@@ -15,6 +15,7 @@ import {
   Bot,
   Box,
   BrainCircuit,
+  BookOpen,
   ChevronRight,
   Clock3,
   Eye,
@@ -25,6 +26,7 @@ import {
   Play,
   RotateCcw,
   Save,
+  Sparkles,
   Users,
 } from "lucide-react";
 
@@ -1889,6 +1891,52 @@ export default function Home() {
             <small>
               <Eye size={13} /> Live AI Campus
             </small>
+          </div>
+          <div className="chapter-mark" aria-label="Current story chapter">
+            <span>CHAPTER {String(day).padStart(2, "0")}</span>
+            <b>{dayPhase} at Lumora</b>
+            <small>{formatTime(minute)} · the world remembers</small>
+          </div>
+          <section className="guiding-quest" aria-label="Current shared quest">
+            <div className="quest-kicker">
+              <Sparkles size={13} /> SHARED QUEST
+            </div>
+            <strong>{PROJECTS[completed % PROJECTS.length].name}</strong>
+            <p>
+              The researchers are turning a shared question into a place the
+              whole campus can use.
+            </p>
+            <div className="quest-progress">
+              <i style={{ width: `${progress}%` }} />
+            </div>
+            <small>
+              {Math.round(progress)}% · {Math.round(knowledge)} knowledge
+            </small>
+          </section>
+          <button
+            className="agent-whisper"
+            onClick={() => {
+              setShowInspector(true);
+              setShowRoster(false);
+            }}
+          >
+            <span
+              className="whisper-portrait"
+              style={{ background: agent.color }}
+            >
+              {agent.name.slice(-1)}
+            </span>
+            <span>
+              <small>
+                <BookOpen size={12} /> {evolutionStage(agent.level || 1)} · Lv.
+                {agent.level || 1}
+              </small>
+              <b>{agent.name}</b>
+              <em>“{agent.thought}”</em>
+            </span>
+          </button>
+          <div className="constellation-lines" aria-hidden="true">
+            <i /> <i /> <i /> <i />
           </div>
           <div className="camera-tools">
             <button
