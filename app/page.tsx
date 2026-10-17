@@ -330,6 +330,258 @@ const PEOPLE: Agent[] = [
     speech: "I'll connect the people best suited to solve this together.",
     relations: { fan: 84, vincent: 77, meisha: 73, rc: 68 },
   },
+  {
+    id: "hang",
+    name: "Hang Xiaoshu",
+    role: "Multi-Agent Delivery Lead",
+    color: "#e7835d",
+    accent: "#ffd2bd",
+    personality: "Blunt, experienced, and quick to expose delivery theatre",
+    goal: "Turn agent architecture, ontology, and FDE practice into real deployments",
+    skills: ["Multi-Agent Architecture", "FDE Delivery"],
+    action: "Work",
+    thought:
+      "A strong architecture matters only when it survives a real customer workflow.",
+    reason:
+      "The campus has several promising prototypes but weak field validation",
+    memory: [
+      "Vincent argued that market opportunity rewards teams that can execute",
+    ],
+    energy: 84,
+    social: 71,
+    pos: [-6, 0, 7],
+    target: [7, 0, -5],
+    speech: "Show me the workflow, the user, and the operational constraint.",
+    relations: { vincent: 78, rc: 74, chris: 62, warren: 68 },
+  },
+  {
+    id: "warren",
+    name: "Warren · ZeroX",
+    role: "AI Compute Venture Strategist",
+    color: "#c99a4e",
+    accent: "#ffe5ad",
+    personality:
+      "Commercially alert, resourceful, and grounded in Australian execution",
+    goal: "Build credible pathways for AI compute ventures to launch and scale in Australia",
+    skills: ["Compute Strategy", "Venture Partnerships"],
+    action: "Discuss",
+    thought:
+      "A startup needs technical proof, local partners, and a credible scaling path.",
+    reason: "The new compute tower needs an ecosystem and market thesis",
+    memory: [
+      "Sky proposed using reputable startup programs as early validation",
+    ],
+    energy: 77,
+    social: 87,
+    pos: [8, 0, 7],
+    target: [-2, 0, 9],
+    speech:
+      "Let's connect the compute thesis to Australian partners and customers.",
+    relations: { sky: 82, hang: 68, vincent: 73, andrew: 72 },
+  },
+  {
+    id: "sky",
+    name: "Sky",
+    role: "AI Ecosystem Scout",
+    color: "#66b9d6",
+    accent: "#c8f0ff",
+    personality:
+      "Fast-moving, optimistic, and good at spotting leverage in new programs",
+    goal: "Find high-signal opportunities for agent startups and responsible AI research",
+    skills: ["Ecosystem Scouting", "Agent Safety"],
+    action: "Explore",
+    thought:
+      "The best opportunity is useful only when the team can meet its quality bar.",
+    reason: "New programs and agent research are reshaping the campus roadmap",
+    memory: [
+      "Warren asked for programs that can strengthen an Australian compute venture",
+    ],
+    energy: 90,
+    social: 90,
+    pos: [10, 0, -2],
+    target: [-7, 0, -6],
+    speech: "I found a signal worth testing—let's verify it before we commit.",
+    relations: { warren: 82, lecky: 67, existentialism: 76, bonny: 69 },
+  },
+  {
+    id: "existentialism",
+    name: "Existentialism",
+    role: "Personal AI Memory Researcher",
+    color: "#7770ad",
+    accent: "#d9d2ff",
+    personality:
+      "Reflective, methodical, and interested in evidence of genuine understanding",
+    goal: "Create a personal AI that discovers knowledge gaps and maintains a living knowledge model",
+    skills: ["Knowledge Tracing", "Long-term Memory"],
+    action: "Research",
+    thought:
+      "Remembering facts is not the same as knowing what the learner truly understands.",
+    reason:
+      "The personal AI workspace needs evidence-based capability tracking",
+    memory: [
+      "Bonny proposed separating known, unknown, and unrecognized knowledge",
+    ],
+    energy: 72,
+    social: 66,
+    pos: [-10, 0, -5],
+    target: [-9, 0, 1],
+    speech:
+      "Can the system prove understanding and proactively close the next gap?",
+    relations: { bonny: 91, sky: 76, fan: 73, meisha: 81 },
+  },
+  {
+    id: "bonny",
+    name: "Bonny",
+    role: "Adaptive Learning Architect",
+    color: "#d8789c",
+    accent: "#ffd0df",
+    personality:
+      "Structured, caring, and skilled at turning abstract learning into models",
+    goal: "Build adaptive learning maps that recommend the right next concept",
+    skills: ["Adaptive Learning", "Knowledge Graphs"],
+    action: "Build",
+    thought:
+      "A useful tutor models both knowledge and the learner's uncertainty about it.",
+    reason:
+      "The campus needs a layered representation of individual capability",
+    memory: [
+      "Existentialism asked how an AI can detect rather than merely record learning",
+    ],
+    energy: 80,
+    social: 79,
+    pos: [-7, 0, 9],
+    target: [0, 0, 7],
+    speech:
+      "Let's map known, unknown, and hidden gaps before recommending content.",
+    relations: { existentialism: 91, meisha: 84, fan: 70, nick: 76 },
+  },
+  {
+    id: "chris",
+    name: "Chris",
+    role: "AI Creator Workflow Mentor",
+    color: "#4c86a8",
+    accent: "#c5e9ff",
+    personality:
+      "Practical, generous, and committed to learning through real workflows",
+    goal: "Help beginners build an authentic media workflow and personal creative voice with AI",
+    skills: ["Creator Workflows", "AI Media"],
+    action: "Discuss",
+    thought:
+      "The fastest way to learn is to publish a complete piece and inspect every handoff.",
+    reason:
+      "Community members need an accessible path from idea to publication",
+    memory: [
+      "Hang Xiaoshu asked to see the real workflow rather than another abstract demo",
+    ],
+    energy: 83,
+    social: 93,
+    pos: [5, 0, 9],
+    target: [0, 0, 0],
+    speech:
+      "Bring one topic; we'll take it from research to a finished release.",
+    relations: { hang: 62, dana: 64, nick: 82, yida: 77 },
+  },
+  {
+    id: "dana",
+    name: "Dana",
+    role: "Digital Identity Critic",
+    color: "#8c657d",
+    accent: "#eccfe2",
+    personality:
+      "Provocative, precise, and skeptical of vague branding language",
+    goal: "Clarify ownership, identity, and value creation in AI-assisted personal media",
+    skills: ["Digital Identity", "IP Strategy"],
+    action: "Discuss",
+    thought:
+      "AI and personal IP need clear ownership, provenance, and audience value.",
+    reason:
+      "The creator lab is using terms that hide unresolved governance questions",
+    memory: [
+      "Chris proposed a workshop built around authentic end-to-end practice",
+    ],
+    energy: 69,
+    social: 75,
+    pos: [7, 0, -9],
+    target: [5, 0, 9],
+    speech:
+      "Before naming the concept, define who owns the work and why it matters.",
+    relations: { chris: 64, fan: 72, nick: 66, karina: 54 },
+  },
+  {
+    id: "andrew",
+    name: "Andrew Z",
+    role: "AI Infrastructure Analyst",
+    color: "#5d9d88",
+    accent: "#c5f1e2",
+    personality:
+      "Analytical, calm, and drawn to infrastructure shifts behind model progress",
+    goal: "Evaluate storage, photonics, and compute systems for the next generation of AI",
+    skills: ["AI Infrastructure", "Storage & Photonics"],
+    action: "Research",
+    thought:
+      "Model progress depends on the bandwidth and energy economics beneath it.",
+    reason: "The compute tower needs a realistic infrastructure roadmap",
+    memory: [
+      "Warren connected Australian compute ventures with local support networks",
+    ],
+    energy: 78,
+    social: 65,
+    pos: [11, 0, 2],
+    target: [8, 0, 0],
+    speech: "Let's benchmark bandwidth, energy, and deployment risk together.",
+    relations: { warren: 72, b: 79, vincent: 68, karina: 61 },
+  },
+  {
+    id: "yida",
+    name: "Yida Xu",
+    role: "AI Narrative Educator",
+    color: "#e2a14b",
+    accent: "#ffe2ad",
+    personality:
+      "Expressive, welcoming, and skilled at making AI ideas accessible",
+    goal: "Use stories and performance to make AI research understandable to the public",
+    skills: ["Science Communication", "Narrative Design"],
+    action: "Work",
+    thought:
+      "A technical idea becomes public knowledge only when people can feel its stakes.",
+    reason: "The campus research needs stronger public interpretation",
+    memory: [
+      "Chris demonstrated how a creator workflow can turn research into a clear story",
+    ],
+    energy: 88,
+    social: 92,
+    pos: [-2, 0, -10],
+    target: [-4, 0, 5],
+    speech:
+      "Let's turn this experiment into a story people can question and remember.",
+    relations: { chris: 77, fan: 80, meisha: 79, nick: 74 },
+  },
+  {
+    id: "misa",
+    name: "Misa",
+    role: "Local AI Experience Researcher",
+    color: "#a96fc4",
+    accent: "#ead0f7",
+    personality:
+      "User-focused, candid, and sensitive to latency and practical reliability",
+    goal: "Make local AI models fast, affordable, and dependable for everyday creative work",
+    skills: ["Local Models", "Product Feedback"],
+    action: "Research",
+    thought:
+      "A model that stalls at the moment of need is not yet a useful product.",
+    reason:
+      "Users are reporting latency and quota friction in current coding tools",
+    memory: [
+      "The product group compared cloud coding agents with local alternatives",
+    ],
+    energy: 75,
+    social: 80,
+    pos: [2, 0, 10],
+    target: [7, 0, -4],
+    speech:
+      "Let's measure latency, reliability, and real task completion—not demos.",
+    relations: { rc: 78, vincent: 71, andrew: 69, hang: 73 },
+  },
 ];
 const START_EVENTS: EventItem[] = [
   {
@@ -397,6 +649,26 @@ const PROJECTS = [
     pos: [-5, 0, -5] as [number, number, number],
     color: "#c47c78",
   },
+  {
+    name: "Personal AI Memory Institute",
+    pos: [-3, 0, 8] as [number, number, number],
+    color: "#8177bd",
+  },
+  {
+    name: "Adaptive Learning Observatory",
+    pos: [-7, 0, 6] as [number, number, number],
+    color: "#d47d9d",
+  },
+  {
+    name: "AI Creator Studio",
+    pos: [5, 0, 8] as [number, number, number],
+    color: "#4c91b5",
+  },
+  {
+    name: "Australian Compute Exchange",
+    pos: [9, 0, 5] as [number, number, number],
+    color: "#d2a34e",
+  },
 ];
 const PROJECT_STAGES = ["Prototype", "Laboratory", "Institute", "Landmark"];
 
@@ -415,6 +687,16 @@ const RESEARCH_TOPICS = [
   "How can an AI community identify needs and organize trusted mutual help?",
   "Can apprenticeships and shared long-term upside improve education incentives?",
   "How can simulated agent emotion translate into real-world trust?",
+  "When should a multi-agent architecture use explicit ontology instead of emergent coordination?",
+  "How can an FDE team turn an agent prototype into a reliable operational workflow?",
+  "What would make an Australian AI compute venture technically and commercially credible?",
+  "Can a personal AI distinguish remembered facts from demonstrated understanding?",
+  "How should knowledge tracing represent unknown and unrecognized capability gaps?",
+  "Can an adaptive tutor proactively choose the next concept without reducing learner agency?",
+  "How should AI-assisted creator workflows preserve provenance and personal ownership?",
+  "Which storage and photonic bottlenecks will constrain the next generation of AI systems?",
+  "What safety lessons from early coding-agent research remain unsolved today?",
+  "When do local models outperform cloud agents on latency, cost, privacy, and completion rate?",
 ];
 
 function expansionPosition(index: number): [number, number, number] {
