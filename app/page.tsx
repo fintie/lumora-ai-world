@@ -672,50 +672,83 @@ const ROAD_NODES: [number, number, number][] = [
 const TARGETS = ROAD_NODES;
 
 const ACTIVITY_VENUES = [
-  { name: "Generative AI Lab", kind: "Research", angle: 0, color: "#82e3dc" },
+  {
+    name: "Generative AI Lab",
+    kind: "Research",
+    angle: 0,
+    radius: 10.6,
+    tangent: -1.8,
+    color: "#82e3dc",
+  },
   {
     name: "Web3 Protocol Lab",
     kind: "Research",
     angle: Math.PI / 4,
+    radius: 11.3,
+    tangent: 1.1,
     color: "#b99cff",
   },
   {
     name: "Robotics Workshop",
     kind: "Build",
     angle: Math.PI / 2,
+    radius: 10.3,
+    tangent: 1.7,
     color: "#ffb172",
   },
   {
     name: "Creator Studio",
     kind: "Work",
     angle: (Math.PI * 3) / 4,
+    radius: 11.8,
+    tangent: -1.25,
     color: "#79c8ef",
   },
   {
     name: "Project Demo Pavilion",
     kind: "Explore",
     angle: Math.PI,
+    radius: 10.5,
+    tangent: 1.55,
     color: "#ffd36f",
   },
   {
     name: "Team Conference Room",
     kind: "Discuss",
     angle: (Math.PI * 5) / 4,
+    radius: 8.9,
+    tangent: -1.35,
     color: "#8fe0ac",
   },
   {
     name: "Data & Simulation Lab",
     kind: "Research",
     angle: (Math.PI * 3) / 2,
+    radius: 12.2,
+    tangent: 0,
     color: "#8caaff",
   },
   {
     name: "Strategy Meeting Room",
     kind: "Discuss",
     angle: (Math.PI * 7) / 4,
+    radius: 11.5,
+    tangent: -1.45,
     color: "#f49ab4",
   },
 ] as const;
+
+function venuePosition(
+  venue: (typeof ACTIVITY_VENUES)[number],
+): [number, number, number] {
+  return [
+    Math.cos(venue.angle) * venue.radius -
+      Math.sin(venue.angle) * venue.tangent,
+    0,
+    Math.sin(venue.angle) * venue.radius +
+      Math.cos(venue.angle) * venue.tangent,
+  ];
+}
 
 function venueEntrance(
   venue: (typeof ACTIVITY_VENUES)[number],
@@ -1509,9 +1542,7 @@ function Classroom({
 }
 
 function ActivityVenue({ venue }: { venue: (typeof ACTIVITY_VENUES)[number] }) {
-  const radius = 10.8;
-  const x = Math.cos(venue.angle) * radius;
-  const z = Math.sin(venue.angle) * radius;
+  const [x, , z] = venuePosition(venue);
   const rotation = -venue.angle + Math.PI / 2;
   const isDemo = venue.name.includes("Demo");
   const isMeeting = venue.kind === "Discuss";
@@ -2092,6 +2123,12 @@ function Scene({
       </mesh>
       {ACTIVITY_VENUES.map((venue) => {
         const drivewayRadius = 15.68;
+        const entrance = venueEntrance(venue);
+        const building = venuePosition(venue);
+        const pathX = entrance[0] - building[0];
+        const pathZ = entrance[2] - building[2];
+        const pathLength = Math.hypot(pathX, pathZ);
+        const pathRotation = Math.atan2(pathX, pathZ);
         return (
           <group key={venue.name}>
             <mesh
@@ -2118,6 +2155,18 @@ function Scene({
               <boxGeometry args={[1.08, 0.06, 3.25]} />
               <meshStandardMaterial color="#897964" roughness={0.98} />
             </mesh>
+            <mesh
+              position={[
+                (entrance[0] + building[0]) / 2,
+                0.041,
+                (entrance[2] + building[2]) / 2,
+              ]}
+              rotation={[0, pathRotation, 0]}
+              receiveShadow
+            >
+              <boxGeometry args={[0.78, 0.045, pathLength]} />
+              <meshStandardMaterial color="#a29176" roughness={0.98} />
+            </mesh>
             <ActivityVenue venue={venue} />
           </group>
         );
@@ -2134,6 +2183,38 @@ function Scene({
           </group>
         );
       })}
+      <mesh
+        position={[0, 0.026, 2.4]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <circleGeometry args={[3.45, 48]} />
+        <meshStandardMaterial color="#4f8057" roughness={1} />
+      </mesh>
+      <CampusBuilding
+        position={[0, 0, -7.4]}
+        size={[7.2, 3.05, 2.25]}
+        label="Main Quadrangle · School of AI"
+        color="#8a694d"
+        glow="#ffd58a"
+      />
+      <WorldLabel position={[0, 0.75, 3.2]} color="#d9efad">
+        University Lawn
+      </WorldLabel>
+      {[
+        [-14.2, -5.8, 0.72],
+        [-14.1, 5.4, 0.78],
+        [-6.1, 14.1, 0.75],
+        [5.7, 14.2, 0.82],
+        [14.1, 5.8, 0.74],
+        [14.2, -5.5, 0.8],
+        [5.9, -15.1, 0.7],
+        [-6.2, -14.8, 0.76],
+        [-3.7, 5.8, 0.6],
+        [4.2, 6.2, 0.64],
+      ].map(([x, z, scale], index) => (
+        <Tree key={`campus-tree-${index}`} x={x} z={z} s={scale} />
+      ))}
       {Array.from({ length: completed }, (_, index) => (
         <GrowthBuilding
           key={`growth-${index}`}
