@@ -1700,3 +1700,58 @@ footer {
     max-height: 52svh;
   }
 }
+
+.observer-level {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #efd17b1a;
+  color: #f5d98b;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.project-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 10px;
+}
+.project-actions button,
+.quest-guide {
+  min-height: 32px;
+  border: 1px solid #5f5b7440;
+  border-radius: 8px;
+  background: #292b49;
+  color: #fff4d5;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.project-actions button:disabled,
+.quest-guide:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.quest-guide {
+  width: 100%;
+  min-height: 28px;
+  margin-top: 9px;
+  border-color: #eed18738;
+  background: #f0d37b17;
+  color: #f7dda0;
+  font-size: 9px;
+}
+.quest-guide:not(:disabled):hover,
+.project-actions button:not(:disabled):hover {
+  border-color: #e7c76a;
+  background: #494366;
+}
+
+@media (max-width: 760px) {
+  .observer-level {
+    display: none;
+  }
+  .quest-guide {
+    display: none;
+  }
+}
