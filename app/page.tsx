@@ -583,6 +583,40 @@ const PEOPLE: Agent[] = [
     relations: { rc: 78, vincent: 71, andrew: 69, hang: 73 },
   },
 ];
+
+const STARTING_GROWTH: Record<
+  string,
+  { level: number; xp: number; daysActive: number; breakthroughs: number }
+> = {
+  karina: { level: 3, xp: 62, daysActive: 11, breakthroughs: 4 },
+  b: { level: 3, xp: 38, daysActive: 10, breakthroughs: 3 },
+  fan: { level: 3, xp: 71, daysActive: 12, breakthroughs: 3 },
+  vincent: { level: 3, xp: 84, daysActive: 13, breakthroughs: 5 },
+  existentialism: { level: 3, xp: 48, daysActive: 9, breakthroughs: 4 },
+  bonny: { level: 3, xp: 29, daysActive: 9, breakthroughs: 3 },
+  warren: { level: 3, xp: 55, daysActive: 10, breakthroughs: 2 },
+  chris: { level: 3, xp: 34, daysActive: 8, breakthroughs: 3 },
+  lecky: { level: 2, xp: 76, daysActive: 6, breakthroughs: 2 },
+  rc: { level: 2, xp: 69, daysActive: 7, breakthroughs: 2 },
+  meisha: { level: 2, xp: 52, daysActive: 6, breakthroughs: 1 },
+  nick: { level: 2, xp: 88, daysActive: 8, breakthroughs: 2 },
+  hang: { level: 2, xp: 73, daysActive: 6, breakthroughs: 2 },
+  sky: { level: 2, xp: 64, daysActive: 5, breakthroughs: 1 },
+  andrew: { level: 2, xp: 57, daysActive: 5, breakthroughs: 2 },
+  yida: { level: 2, xp: 43, daysActive: 4, breakthroughs: 1 },
+  misa: { level: 2, xp: 36, daysActive: 4, breakthroughs: 1 },
+  dana: { level: 2, xp: 31, daysActive: 4, breakthroughs: 1 },
+};
+
+PEOPLE.forEach((person) => {
+  const growth = STARTING_GROWTH[person.id];
+  if (!growth) return;
+  person.level = growth.level;
+  person.xp = growth.xp;
+  person.daysActive = growth.daysActive;
+  person.breakthroughs = growth.breakthroughs;
+  person.evolutionStage = evolutionStage(growth.level);
+});
 const START_EVENTS: EventItem[] = [
   {
     id: 1,
@@ -2175,7 +2209,9 @@ export default function Home() {
                   </span>
                   <span>
                     <b>{a.name}</b>
-                    <small>{a.action}</small>
+                    <small>
+                      {a.action} · Lv.{a.level || 1}
+                    </small>
                   </span>
                 </button>
               ))}
