@@ -644,13 +644,30 @@ const START_EVENTS: EventItem[] = [
   },
 ];
 const TARGETS: [number, number, number][] = [
-  [-8, 0, -6],
-  [-4, 0, 5],
+  [-15, 0, -10],
+  [-15, 0, 3],
+  [-13, 0, 11],
+  [-8, 0, 15],
+  [0, 0, 16],
+  [8, 0, 15],
+  [14, 0, 10],
+  [16, 0, 2],
+  [14, 0, -7],
+  [9, 0, -12],
+  [3, 0, -14],
+  [-4, 0, -14],
+  [-10, 0, -11],
+  [-11, 0, -4],
+  [-8, 0, 4],
+  [-5, 0, 12],
+  [5, 0, 12],
+  [10, 0, 5],
+  [8, 0, -4],
+  [4, 0, -9],
+  [-4, 0, -9],
   [0, 0, 0],
-  [7, 0, -5],
-  [8, 0, 3],
   [-1, 0, 7],
-  [3, 0, -1],
+  [3, 0, -2],
 ];
 const PROJECTS = [
   {
@@ -1417,23 +1434,47 @@ function Avatar({
     () => new THREE.Vector3(...agent.target),
     [agent.target],
   );
+  const turner = useMemo(() => new THREE.Object3D(), []);
+  const direction = useMemo(() => new THREE.Vector3(), []);
+  const walkSpeed = useMemo(
+    () =>
+      1.05 +
+      ([...agent.id].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) %
+        24) /
+        100,
+    [agent.id],
+  );
   useFrame((state, dt) => {
     if (!ref.current || paused) return;
-    const distance = ref.current.position.distanceTo(target),
-      walking = distance > 0.35;
-    ref.current.position.lerp(
-      new THREE.Vector3(target.x, 0.06, target.z),
-      Math.min(1, dt * 0.28 * speed),
+    direction.set(
+      target.x - ref.current.position.x,
+      0,
+      target.z - ref.current.position.z,
     );
-    // Keep the robot upright: only calculate heading on the horizontal plane.
-    // Looking at a higher Y value tilted the entire group and made it appear
-    // to walk on its side.
-    ref.current.lookAt(target.x, ref.current.position.y, target.z);
+    const distance = direction.length();
+    const walking = distance > 0.18;
+    const motion = THREE.MathUtils.smoothstep(distance, 0.12, 0.9);
+    const simPace = Math.sqrt(speed);
+    if (walking) {
+      direction.normalize();
+      ref.current.position.addScaledVector(
+        direction,
+        Math.min(distance - 0.12, dt * walkSpeed * simPace),
+      );
+      turner.position.copy(ref.current.position);
+      turner.lookAt(target.x, ref.current.position.y, target.z);
+      ref.current.quaternion.slerp(turner.quaternion, 1 - Math.exp(-dt * 6.5));
+    }
+    const strideTime = state.clock.elapsedTime * 5.4 * walkSpeed * simPace;
+    ref.current.position.y = THREE.MathUtils.damp(
+      ref.current.position.y,
+      0.06 + (walking ? Math.abs(Math.sin(strideTime)) * 0.045 * motion : 0),
+      12,
+      dt,
+    );
     ref.current.rotation.x = 0;
     ref.current.rotation.z = 0;
-    const swing = walking
-      ? Math.sin(state.clock.elapsedTime * 6 * speed) * 0.55
-      : 0;
+    const swing = walking ? Math.sin(strideTime) * 0.52 * motion : 0;
     if (leftArm.current) leftArm.current.rotation.x = swing;
     if (rightArm.current) rightArm.current.rotation.x = -swing;
     if (leftLeg.current) leftLeg.current.rotation.x = -swing * 0.65;
@@ -1442,7 +1483,7 @@ function Avatar({
       scarf.current.rotation.x =
         -0.25 +
         Math.sin(state.clock.elapsedTime * 2.8 + agent.pos[0]) *
-          (walking ? 0.12 : 0.04);
+          (walking ? 0.14 * motion : 0.035);
   });
   const glow = selected ? "#ffe493" : "#9ff7ff";
   return (
@@ -2085,7 +2126,7 @@ export default function Home() {
             }),
           );
         }
-        if (Math.random() < 0.26) {
+        if (Math.random() < 0.08) {
           setAgents((old) => {
             const idx = Math.floor(Math.random() * old.length),
               cur = old[idx];
@@ -2130,7 +2171,7 @@ export default function Home() {
             return copy;
           });
         }
-        if (Math.random() < 0.22) {
+        if (Math.random() < 0.07) {
           setAgents((old) => {
             const first = Math.floor(Math.random() * old.length);
             let second = Math.floor(Math.random() * old.length);
