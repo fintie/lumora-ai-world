@@ -2891,7 +2891,7 @@ export default function Home() {
           <section className="detail-section">
             <h2>Memories</h2>
             {agent.memory.map((m, i) => (
-              <div className="memory" key={m}>
+              <div className="memory" key={`${i}-${m}`}>
                 <Clock3 size={14} />
                 <span>{m}</span>
                 <small>{i + 2} hours ago</small>
