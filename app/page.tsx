@@ -741,54 +741,84 @@ function buildRoadRoute(
 }
 const PROJECTS = [
   {
-    name: "Multi-Agent Research Center",
+    name: "Autonomous Mobility Loop",
     pos: [2.8, 0, -2] as [number, number, number],
     color: "#678c75",
+    kind: "mobility",
+    team: "Vincent · rc · B",
+    impact: "Connects labs with agent-safe paths",
   },
   {
-    name: "Embodied AI Laboratory",
+    name: "Distributed Energy Garden",
     pos: [-2.5, 0, -6] as [number, number, number],
     color: "#a66f4c",
+    kind: "energy",
+    team: "Warren · Karina · Tianbao",
+    impact: "Powers night research and public lighting",
   },
   {
-    name: "Privacy Computing Lab",
+    name: "Community Knowledge Commons",
     pos: [-8, 0, 0] as [number, number, number],
     color: "#72a88c",
+    kind: "knowledge",
+    team: "Fan · Nick Qi · Bonny",
+    impact: "Turns shared memory into open campus knowledge",
   },
   {
-    name: "Decentralized Compute Tower",
+    name: "Robotics Fabrication Workshop",
     pos: [8, 0, 0] as [number, number, number],
     color: "#d1a34f",
+    kind: "robotics",
+    team: "B · Chris · Vincent",
+    impact: "Builds embodied prototypes and field tools",
   },
   {
     name: "On-chain Knowledge Library",
     pos: [2, 0, 7] as [number, number, number],
     color: "#7289a9",
+    kind: "knowledge",
+    team: "Lecky · A Lu · Karina",
+    impact: "Preserves provenance for research evidence",
   },
   {
     name: "AI Safety Evaluation Center",
     pos: [-5, 0, -5] as [number, number, number],
     color: "#c47c78",
+    kind: "safety",
+    team: "Sky · Fan · Jayson",
+    impact: "Adds evaluation rooms and safety checkpoints",
   },
   {
     name: "Personal AI Memory Institute",
     pos: [-3, 0, 8] as [number, number, number],
     color: "#8177bd",
+    kind: "knowledge",
+    team: "Bonny · Nick Qi · Michelle",
+    impact: "Builds long-term learning and memory gardens",
   },
   {
     name: "Adaptive Learning Observatory",
     pos: [-7, 0, 6] as [number, number, number],
     color: "#d47d9d",
+    kind: "learning",
+    team: "Meisha · Dana · Hugo",
+    impact: "Creates adaptive classrooms across campus",
   },
   {
     name: "AI Creator Studio",
     pos: [5, 0, 8] as [number, number, number],
     color: "#4c91b5",
+    kind: "creator",
+    team: "Chris · Misa · Andrew",
+    impact: "Opens shared production and demo spaces",
   },
   {
     name: "Australian Compute Exchange",
     pos: [9, 0, 5] as [number, number, number],
     color: "#d2a34e",
+    kind: "energy",
+    team: "Warren · B · rc",
+    impact: "Expands sovereign compute capacity",
   },
 ];
 const PROJECT_STAGES = ["Prototype", "Laboratory", "Institute", "Landmark"];
@@ -1501,6 +1531,34 @@ function GrowthBuilding({
         <boxGeometry args={[0.52, 1.05, 0.08]} />
         <meshStandardMaterial color="#674b38" />
       </mesh>
+      {project.kind === "energy" && (
+        <group position={[0, 2.78, 0]} rotation={[0.16, 0, 0]}>
+          {[-0.72, 0, 0.72].map((x) => (
+            <mesh key={x} position={[x, 0, 0]}>
+              <boxGeometry args={[0.62, 0.06, 0.82]} />
+              <meshStandardMaterial color="#244c61" emissive="#3e84a2" emissiveIntensity={0.34} metalness={0.55} />
+            </mesh>
+          ))}
+        </group>
+      )}
+      {project.kind === "mobility" && (
+        <mesh position={[0, 0.16, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.7, 1.92, 28]} />
+          <meshStandardMaterial color="#8fe8c0" emissive="#4ecb9a" emissiveIntensity={1.2} />
+        </mesh>
+      )}
+      {project.kind === "knowledge" && (
+        <group position={[0, 2.72, 0]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.72, 16, 10]} />
+            <meshStandardMaterial color="#93bba7" transparent opacity={0.62} metalness={0.22} roughness={0.18} />
+          </mesh>
+          <mesh position={[0, -0.12, 0]}>
+            <icosahedronGeometry args={[0.26, 1]} />
+            <meshStandardMaterial color={project.color} emissive={project.color} emissiveIntensity={1.6} />
+          </mesh>
+        </group>
+      )}
       {level >= 2 && (
         <RoundedBox
           args={[1.5, 0.62, 1.35]}
@@ -1538,6 +1596,49 @@ function GrowthBuilding({
       )}
       <WorldLabel position={[0, 3.05, 0]} color="#f7d873">
         {project.name} · {PROJECT_STAGES[Math.min(3, level - 1)]}
+      </WorldLabel>
+    </group>
+  );
+}
+
+function ConstructionSite({
+  project,
+  index,
+  progress,
+}: {
+  project: (typeof PROJECTS)[number];
+  index: number;
+  progress: number;
+}) {
+  const height = 0.65 + (progress / 100) * 1.75;
+  return (
+    <group position={expansionPosition(index)} scale={0.74}>
+      <mesh position={[0, 0.07, 0]} receiveShadow>
+        <boxGeometry args={[3.7, 0.14, 3.15]} />
+        <meshStandardMaterial color="#746553" roughness={1} />
+      </mesh>
+      {[-1.35, 1.35].flatMap((x) => [-1.05, 1.05].map((z) => (
+        <mesh key={`${x}-${z}`} position={[x, height / 2, z]} castShadow>
+          <boxGeometry args={[0.15, height, 0.15]} />
+          <meshStandardMaterial color="#c99558" roughness={0.82} />
+        </mesh>
+      )))}
+      <mesh position={[0, Math.min(height, 1.9), 0]} castShadow>
+        <boxGeometry args={[3.2, 0.14, 2.65]} />
+        <meshStandardMaterial color={project.color} transparent opacity={0.78} />
+      </mesh>
+      <group position={[-1.62, 1.75, -1.2]}>
+        <mesh position={[0, 0.85, 0]}>
+          <boxGeometry args={[0.1, 1.7, 0.1]} />
+          <meshStandardMaterial color="#d8aa62" />
+        </mesh>
+        <mesh position={[0.7, 1.65, 0]}>
+          <boxGeometry args={[1.5, 0.08, 0.08]} />
+          <meshStandardMaterial color="#d8aa62" />
+        </mesh>
+      </group>
+      <WorldLabel position={[0, 3.15, 0]} color={project.color}>
+        {project.name} · {Math.round(progress)}%
       </WorldLabel>
     </group>
   );
@@ -2219,27 +2320,17 @@ function Scene({
           Lumora Collaboration Table
         </WorldLabel>
       </group>
-      <group position={expansionPosition(completed)}>
-        <mesh position={[0, 0.08, 0]}>
-          <boxGeometry args={[3.5, 0.16, 3]} />
-          <meshStandardMaterial color="#82715f" />
-        </mesh>
-        {[
-          [-1.3, -1],
-          [1.3, -1],
-          [-1.3, 1],
-          [1.3, 1],
-        ].map((p, i) => (
-          <mesh key={i} position={[p[0], progress > 65 ? 1.1 : 0.65, p[1]]}>
-            <boxGeometry args={[0.16, progress > 65 ? 2.2 : 1.3, 0.16]} />
-            <meshStandardMaterial color="#d3a262" />
-          </mesh>
-        ))}
-        <WorldLabel position={[0, 2.5, 0]} color="#f7d873">
-          Building: {PROJECTS[completed % PROJECTS.length].name} ·{" "}
-          {Math.round(progress)}%
-        </WorldLabel>
-      </group>
+      {Array.from({ length: 3 }, (_, slot) => {
+        const projectIndex = completed + slot;
+        return (
+          <ConstructionSite
+            key={`active-project-${projectIndex}`}
+            project={PROJECTS[projectIndex % PROJECTS.length]}
+            index={projectIndex}
+            progress={Math.max(8, progress - slot * 18)}
+          />
+        );
+      })}
       {agents.map((a) => (
         <Avatar
           key={a.id}
@@ -2541,7 +2632,7 @@ export default function Home() {
               setProjectLevels((levels) => ({ ...levels, [count]: 1 }));
               setObserverXp((value) => value + 25);
               addEvent(
-                `${built.name} is complete; new courses and cross-lab projects are now open`,
+                `${built.name} is complete; ${built.impact.toLowerCase()}`,
                 "world",
                 next,
               );
@@ -2552,7 +2643,7 @@ export default function Home() {
                 ...person,
                 xp: Math.min(99, (person.xp || 0) + 12),
                 memory: [
-                  "The team completed a new research facility",
+                  `The community completed ${built.name} and reshaped the campus`,
                   ...person.memory,
                 ].slice(0, 8),
               })),
@@ -2741,17 +2832,21 @@ export default function Home() {
               </span>
               <small>{completed} completed</small>
             </div>
-            <div className="project-line">
-              <div className="project-icon">⌂</div>
-              <div>
-                <b>{PROJECTS[completed % PROJECTS.length].name}</b>
-                <small>Vincent · rc · B</small>
-                <i>
-                  <em style={{ width: `${progress}%` }} />
-                </i>
-              </div>
-              <strong>{Math.round(progress)}%</strong>
-            </div>
+            {Array.from({ length: 3 }, (_, slot) => {
+              const activeProgress = Math.max(8, progress - slot * 18);
+              const project = PROJECTS[(completed + slot) % PROJECTS.length];
+              return (
+                <div className="project-line" key={`${project.name}-${slot}`} title={project.impact}>
+                  <div className="project-icon">{slot === 0 ? "⌂" : slot === 1 ? "⚡" : "✦"}</div>
+                  <div>
+                    <b>{project.name}</b>
+                    <small>{project.team}</small>
+                    <i><em style={{ width: `${activeProgress}%`, background: project.color }} /></i>
+                  </div>
+                  <strong>{Math.round(activeProgress)}%</strong>
+                </div>
+              );
+            })}
             <div className="resources">
               <span>
                 Compute <b>{Math.round(wood)}</b>
