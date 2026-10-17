@@ -66,6 +66,8 @@ type EventItem = {
 type Snapshot = {
   agents: Agent[];
   day?: number;
+  observerXp?: number;
+  projectLevels?: Record<number, number>;
   minute: number;
   wood: number;
   knowledge: number;
@@ -396,6 +398,7 @@ const PROJECTS = [
     color: "#c47c78",
   },
 ];
+const PROJECT_STAGES = ["Prototype", "Laboratory", "Institute", "Landmark"];
 
 const RESEARCH_TOPICS = [
   "Can on-chain reputation reduce hallucination cascades in multi-agent teams?",
@@ -895,12 +898,14 @@ function Classroom({
 function GrowthBuilding({
   project,
   index,
+  level,
 }: {
   project: (typeof PROJECTS)[number];
   index: number;
+  level: number;
 }) {
   return (
-    <group position={expansionPosition(index)} scale={0.72}>
+    <group position={expansionPosition(index)} scale={0.72 + level * 0.035}>
       <RoundedBox
         args={[2.7, 1.7, 2.3]}
         radius={0.12}
@@ -918,8 +923,43 @@ function GrowthBuilding({
         <boxGeometry args={[0.52, 1.05, 0.08]} />
         <meshStandardMaterial color="#674b38" />
       </mesh>
+      {level >= 2 && (
+        <RoundedBox
+          args={[1.5, 0.62, 1.35]}
+          radius={0.1}
+          smoothness={4}
+          position={[0, 2.72, 0]}
+          castShadow
+        >
+          <meshStandardMaterial color="#f0dfbd" roughness={0.72} />
+        </RoundedBox>
+      )}
+      {level >= 3 && (
+        <group position={[0, 3.45, 0]}>
+          <mesh castShadow>
+            <cylinderGeometry args={[0.18, 0.3, 1.25, 8]} />
+            <meshStandardMaterial color={project.color} metalness={0.25} />
+          </mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.72, 0.055, 8, 28]} />
+            <meshStandardMaterial
+              color="#ffe39a"
+              emissive="#e7b950"
+              emissiveIntensity={1.2}
+            />
+          </mesh>
+        </group>
+      )}
+      {level >= 4 && (
+        <pointLight
+          position={[0, 4.2, 0]}
+          color={project.color}
+          intensity={3}
+          distance={9}
+        />
+      )}
       <WorldLabel position={[0, 3.05, 0]} color="#f7d873">
-        {project.name}
+        {project.name} · {PROJECT_STAGES[Math.min(3, level - 1)]}
       </WorldLabel>
     </group>
   );
@@ -1163,6 +1203,7 @@ function Scene({
   progress,
   completed,
   minute,
+  projectLevels,
 }: {
   agents: Agent[];
   selected: string;
@@ -1173,6 +1214,7 @@ function Scene({
   progress: number;
   completed: number;
   minute: number;
+  projectLevels: Record<number, number>;
 }) {
   const sunPhase = (minute / 1440) * Math.PI * 2 - Math.PI / 2;
   const daylight = THREE.MathUtils.clamp(Math.sin(sunPhase), 0, 1);
@@ -1354,6 +1396,7 @@ function Scene({
           key={`growth-${index}`}
           project={PROJECTS[index % PROJECTS.length]}
           index={index}
+          level={projectLevels[index] || 1}
         />
       ))}
       <WorldLabel position={[0, 7.2, -7]}>
@@ -1447,6 +1490,10 @@ export default function Home() {
   const [knowledge, setKnowledge] = useState(38);
   const [progress, setProgress] = useState(46);
   const [completed, setCompleted] = useState(0);
+  const [projectLevels, setProjectLevels] = useState<Record<number, number>>(
+    {},
+  );
+  const [observerXp, setObserverXp] = useState(0);
   const [events, setEvents] = useState(START_EVENTS);
   const [follow, setFollow] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -1481,6 +1528,19 @@ export default function Home() {
         const next = (m + 5 * speed) % 1440;
         if (next < m) {
           setDay((currentDay) => currentDay + 1);
+          if (completed > 0) {
+            setProjectLevels((levels) => {
+              const index = (day + completed) % completed;
+              const current = levels[index] || 1;
+              if (current >= 4) return levels;
+              addEvent(
+                `${PROJECTS[index % PROJECTS.length].name} evolved into a ${PROJECT_STAGES[current]}`,
+                "world",
+                next,
+              );
+              return { ...levels, [index]: current + 1 };
+            });
+          }
           setAgents((old) =>
             old.map((person, index) => {
               const earned =
@@ -1642,6 +1702,8 @@ export default function Home() {
           if (n >= 100) {
             setCompleted((count) => {
               const built = PROJECTS[count % PROJECTS.length];
+              setProjectLevels((levels) => ({ ...levels, [count]: 1 }));
+              setObserverXp((value) => value + 25);
               addEvent(
                 `${built.name} is complete; new courses and cross-lab projects are now open`,
                 "world",
@@ -1667,11 +1729,41 @@ export default function Home() {
       });
     }, 1100);
     return () => clearInterval(timer);
-  }, [paused, speed, addEvent, day]);
+  }, [paused, speed, addEvent, day, completed]);
+  const observerLevel = 1 + Math.floor(observerXp / 100);
+  const guideProject = () => {
+    if (knowledge < 10 || wood < 10) return;
+    setKnowledge((value) => value - 10);
+    setWood((value) => value - 10);
+    setProgress((value) => Math.min(99, value + 15));
+    setObserverXp((value) => value + 12);
+    addEvent(
+      "You guided the active project with shared knowledge and compute",
+      "work",
+      minute,
+    );
+  };
+  const evolveLatestProject = () => {
+    if (completed < 1 || knowledge < 20 || wood < 15) return;
+    const index = completed - 1;
+    const level = projectLevels[index] || 1;
+    if (level >= 4) return;
+    setKnowledge((value) => value - 20);
+    setWood((value) => value - 15);
+    setProjectLevels((levels) => ({ ...levels, [index]: level + 1 }));
+    setObserverXp((value) => value + 30);
+    addEvent(
+      `You evolved ${PROJECTS[index % PROJECTS.length].name} into a ${PROJECT_STAGES[level]}`,
+      "world",
+      minute,
+    );
+  };
   const save = () => {
     const snapshot: Snapshot = {
       agents,
       day,
+      observerXp,
+      projectLevels,
       minute,
       wood,
       knowledge,
@@ -1690,6 +1782,8 @@ export default function Home() {
     setAgents(s.agents);
     setMinute(s.minute);
     setDay(s.day || 12);
+    setObserverXp(s.observerXp || 0);
+    setProjectLevels(s.projectLevels || {});
     setWood(s.wood);
     setKnowledge(s.knowledge);
     setProgress(s.progress);
@@ -1717,6 +1811,7 @@ export default function Home() {
           <span className="weather">
             {minute >= 420 && minute < 1080 ? "☀" : "☾"} {dayPhase} · 18°C
           </span>
+          <span className="observer-level">Guide Lv.{observerLevel}</span>
         </div>
         <div className="header-actions">
           <button className="icon-button" onClick={save} title="Save world">
@@ -1833,6 +1928,25 @@ export default function Home() {
                 Data <b>82</b>
               </span>
             </div>
+            <div className="project-actions">
+              <button
+                onClick={guideProject}
+                disabled={knowledge < 10 || wood < 10}
+              >
+                Guide +15%
+              </button>
+              <button
+                onClick={evolveLatestProject}
+                disabled={
+                  completed < 1 ||
+                  knowledge < 20 ||
+                  wood < 15 ||
+                  (projectLevels[completed - 1] || 1) >= 4
+                }
+              >
+                Evolve latest
+              </button>
+            </div>
           </div>
         </aside>
         <div className="world-panel">
@@ -1855,6 +1969,7 @@ export default function Home() {
               progress={progress}
               completed={completed}
               minute={minute}
+              projectLevels={projectLevels}
             />
           </Canvas>
           <div className="town-ui-tools" aria-label="Town interface panels">
@@ -1912,6 +2027,13 @@ export default function Home() {
             <small>
               {Math.round(progress)}% · {Math.round(knowledge)} knowledge
             </small>
+            <button
+              className="quest-guide"
+              onClick={guideProject}
+              disabled={knowledge < 10 || wood < 10}
+            >
+              Guide project · +12 XP
+            </button>
           </section>
           <button
             className="agent-whisper"
