@@ -47,6 +47,9 @@ type Agent = {
   social: number;
   level?: number;
   xp?: number;
+  evolutionStage?: "Apprentice" | "Specialist" | "Principal" | "Pioneer";
+  daysActive?: number;
+  breakthroughs?: number;
   pos: [number, number, number];
   target: [number, number, number];
   speech?: string;
@@ -60,6 +63,7 @@ type EventItem = {
 };
 type Snapshot = {
   agents: Agent[];
+  day?: number;
   minute: number;
   wood: number;
   knowledge: number;
@@ -67,6 +71,24 @@ type Snapshot = {
   completed?: number;
   events: EventItem[];
 };
+
+const EVOLUTION_SKILLS = [
+  "Causal Reasoning",
+  "Multi-Agent Coordination",
+  "Reproducible Experiment Design",
+  "Research Leadership",
+  "Systems Thinking",
+  "Conflict Mediation",
+  "Autonomous Tool Use",
+  "Knowledge Synthesis",
+];
+
+function evolutionStage(level: number): Agent["evolutionStage"] {
+  if (level >= 8) return "Pioneer";
+  if (level >= 5) return "Principal";
+  if (level >= 3) return "Specialist";
+  return "Apprentice";
+}
 
 const PEOPLE: Agent[] = [
   {
@@ -1418,6 +1440,7 @@ export default function Home() {
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [minute, setMinute] = useState(494);
+  const [day, setDay] = useState(12);
   const [wood, setWood] = useState(64);
   const [knowledge, setKnowledge] = useState(38);
   const [progress, setProgress] = useState(46);
@@ -1454,6 +1477,56 @@ export default function Home() {
     const timer = setInterval(() => {
       setMinute((m) => {
         const next = (m + 5 * speed) % 1440;
+        if (next < m) {
+          setDay((currentDay) => currentDay + 1);
+          setAgents((old) =>
+            old.map((person, index) => {
+              const earned =
+                12 +
+                Math.round((person.energy + person.social) / 24) +
+                (person.action === "Research" || person.action === "Build"
+                  ? 5
+                  : 0);
+              const totalXp = (person.xp || 0) + earned;
+              const levelsGained = Math.floor(totalXp / 100);
+              const nextLevel = (person.level || 1) + levelsGained;
+              const nextSkills = [...person.skills];
+              if (levelsGained > 0) {
+                const learned =
+                  EVOLUTION_SKILLS[
+                    (nextLevel + index + (person.daysActive || 0)) %
+                      EVOLUTION_SKILLS.length
+                  ];
+                if (!nextSkills.includes(learned)) nextSkills.push(learned);
+                addEvent(
+                  `${person.name} evolved into a ${evolutionStage(nextLevel)} and learned ${learned}`,
+                  "memory",
+                  next,
+                );
+              }
+              const dailyMemory = `Day ${day + 1} reflection — ${person.action} strengthened ${nextSkills[nextSkills.length - 1]}`;
+              return {
+                ...person,
+                level: nextLevel,
+                xp: totalXp % 100,
+                evolutionStage: evolutionStage(nextLevel),
+                daysActive: (person.daysActive || 0) + 1,
+                breakthroughs:
+                  (person.breakthroughs || 0) +
+                  (person.action === "Research" && Math.random() < 0.3 ? 1 : 0),
+                skills: nextSkills.slice(-6),
+                goal:
+                  levelsGained > 0
+                    ? `Lead a ${nextSkills[nextSkills.length - 1]} initiative that advances ${person.goal.toLowerCase()}`
+                    : person.goal,
+                thought: `Yesterday's evidence changed my priorities. Today I will apply ${nextSkills[nextSkills.length - 1]}.`,
+                reason:
+                  "Daily reflection combined experience, long-term memory, relationships, and recent outcomes",
+                memory: [dailyMemory, ...person.memory].slice(0, 8),
+              };
+            }),
+          );
+        }
         if (Math.random() < 0.26) {
           setAgents((old) => {
             const idx = Math.floor(Math.random() * old.length),
@@ -1546,7 +1619,7 @@ export default function Home() {
                       : `Agreed. I'll design the validation using ${person.skills[0]}.`,
                 thought: `${partner.role}'s perspective is changing my research judgment.`,
                 reason: `Recent memories, shared goals, and trust in ${partner.name} triggered this discussion`,
-                memory: [memory, ...person.memory].slice(0, 4),
+                memory: [memory, ...person.memory].slice(0, 8),
                 relations: {
                   ...person.relations,
                   [partner.id]: Math.max(
@@ -1581,7 +1654,7 @@ export default function Home() {
                 memory: [
                   "The team completed a new research facility",
                   ...person.memory,
-                ].slice(0, 3),
+                ].slice(0, 8),
               })),
             );
             return 0;
@@ -1592,10 +1665,11 @@ export default function Home() {
       });
     }, 1100);
     return () => clearInterval(timer);
-  }, [paused, speed, addEvent]);
+  }, [paused, speed, addEvent, day]);
   const save = () => {
     const snapshot: Snapshot = {
       agents,
+      day,
       minute,
       wood,
       knowledge,
@@ -1613,6 +1687,7 @@ export default function Home() {
     const s = JSON.parse(raw) as Snapshot;
     setAgents(s.agents);
     setMinute(s.minute);
+    setDay(s.day || 12);
     setWood(s.wood);
     setKnowledge(s.knowledge);
     setProgress(s.progress);
@@ -1634,7 +1709,9 @@ export default function Home() {
         <div className="world-status">
           <span className={paused ? "dot paused" : "dot"} />
           <b>{paused ? "World Paused" : "World Running"}</b>
-          <span>Day 12 · {formatTime(minute)}</span>
+          <span>
+            Day {day} · {formatTime(minute)}
+          </span>
           <span className="weather">
             {minute >= 420 && minute < 1080 ? "☀" : "☾"} {dayPhase} · 18°C
           </span>
@@ -1889,6 +1966,16 @@ export default function Home() {
               <i>
                 <em style={{ width: `${agent.xp || 0}%` }} />
               </i>
+            </div>
+            <div>
+              <span>Evolution Stage</span>
+              <b>{evolutionStage(agent.level || 1)}</b>
+            </div>
+            <div>
+              <span>Active / Breakthroughs</span>
+              <b>
+                {agent.daysActive || 0}d · {agent.breakthroughs || 0}
+              </b>
             </div>
           </div>
           <section className="info-card thought">
