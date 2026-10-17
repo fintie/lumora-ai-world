@@ -403,16 +403,76 @@ function Tree({ x, z, s = 1 }: { x: number; z: number; s?: number }) {
     <group position={[x, 0, z]} scale={s}>
       <mesh position={[0, 0.85, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.25, 1.7, 7]} />
-        <meshStandardMaterial color="#3e3022" roughness={1} />
+        <meshStandardMaterial color="#684a39" roughness={1} />
       </mesh>
       <mesh position={[0, 2, 0]} castShadow>
         <coneGeometry args={[1.05, 2.4, 8]} />
-        <meshStandardMaterial color="#173e29" roughness={0.95} />
+        <meshStandardMaterial color="#234d47" roughness={0.95} />
       </mesh>
       <mesh position={[0.2, 2.7, 0.1]} castShadow>
         <coneGeometry args={[0.75, 1.6, 8]} />
-        <meshStandardMaterial color="#28583a" roughness={0.95} />
+        <meshStandardMaterial color="#3e7160" roughness={0.95} />
       </mesh>
+    </group>
+  );
+}
+function StoryLantern({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 0.55, 0]} castShadow>
+        <cylinderGeometry args={[0.035, 0.055, 1.1, 8]} />
+        <meshStandardMaterial color="#473b52" roughness={0.75} />
+      </mesh>
+      <mesh position={[0, 1.16, 0]}>
+        <dodecahedronGeometry args={[0.16, 0]} />
+        <meshStandardMaterial
+          color="#ffe9a8"
+          emissive="#ffc45c"
+          emissiveIntensity={3}
+        />
+      </mesh>
+      <pointLight
+        position={[0, 1.15, 0]}
+        color="#ffc56f"
+        intensity={1.1}
+        distance={4.2}
+      />
+    </group>
+  );
+}
+function ReflectionGarden() {
+  const blooms = [
+    [-1.1, -0.6],
+    [-0.55, 0.45],
+    [0.1, -0.25],
+    [0.7, 0.55],
+    [1.2, -0.45],
+  ];
+  return (
+    <group position={[-3.9, 0, 5.7]}>
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[1.85, 24]} />
+        <meshStandardMaterial color="#355c4d" roughness={1} />
+      </mesh>
+      {blooms.map(([x, z], i) => (
+        <group key={i} position={[x, 0, z]}>
+          <mesh position={[0, 0.28, 0]}>
+            <cylinderGeometry args={[0.018, 0.025, 0.52, 7]} />
+            <meshStandardMaterial color="#6c9a72" />
+          </mesh>
+          <mesh position={[0, 0.58, 0]}>
+            <icosahedronGeometry args={[0.13 + (i % 2) * 0.03, 0]} />
+            <meshStandardMaterial
+              color={i % 2 ? "#ffb1c8" : "#ffd883"}
+              emissive="#a84865"
+              emissiveIntensity={0.45}
+            />
+          </mesh>
+        </group>
+      ))}
+      <WorldLabel position={[0, 1.45, 0]} color="#ffd7a3">
+        Reflection Garden
+      </WorldLabel>
     </group>
   );
 }
@@ -876,7 +936,8 @@ function Avatar({
     leftArm = useRef<THREE.Group>(null),
     rightArm = useRef<THREE.Group>(null),
     leftLeg = useRef<THREE.Group>(null),
-    rightLeg = useRef<THREE.Group>(null);
+    rightLeg = useRef<THREE.Group>(null),
+    scarf = useRef<THREE.Group>(null);
   const target = useMemo(
     () => new THREE.Vector3(...agent.target),
     [agent.target],
@@ -902,6 +963,11 @@ function Avatar({
     if (rightArm.current) rightArm.current.rotation.x = -swing;
     if (leftLeg.current) leftLeg.current.rotation.x = -swing * 0.65;
     if (rightLeg.current) rightLeg.current.rotation.x = swing * 0.65;
+    if (scarf.current)
+      scarf.current.rotation.x =
+        -0.25 +
+        Math.sin(state.clock.elapsedTime * 2.8 + agent.pos[0]) *
+          (walking ? 0.12 : 0.04);
   });
   const glow = selected ? "#ffe493" : "#9ff7ff";
   return (
@@ -928,8 +994,8 @@ function Avatar({
       >
         <meshStandardMaterial
           color={agent.color}
-          metalness={0.35}
-          roughness={0.32}
+          metalness={0.08}
+          roughness={0.72}
         />
       </RoundedBox>
       <RoundedBox
@@ -941,8 +1007,8 @@ function Avatar({
       >
         <meshStandardMaterial
           color={agent.color}
-          metalness={0.42}
-          roughness={0.25}
+          metalness={0.06}
+          roughness={0.68}
         />
       </RoundedBox>
       <RoundedBox
@@ -967,18 +1033,20 @@ function Avatar({
           />
         </mesh>
       ))}
-      <mesh position={[0, 2.13, 0]}>
-        <cylinderGeometry args={[0.018, 0.018, 0.22, 8]} />
-        <meshStandardMaterial color="#84939a" metalness={0.8} />
-      </mesh>
-      <mesh position={[0, 2.27, 0]}>
-        <sphereGeometry args={[0.055, 10, 10]} />
-        <meshStandardMaterial
-          color={agent.accent}
-          emissive={agent.accent}
-          emissiveIntensity={2.5}
-        />
-      </mesh>
+      <group ref={scarf} position={[0, 1.48, -0.29]}>
+        <mesh position={[0, -0.18, -0.15]} rotation={[0.35, 0, 0]} castShadow>
+          <boxGeometry args={[0.62, 0.14, 0.08]} />
+          <meshStandardMaterial color={agent.accent} roughness={0.85} />
+        </mesh>
+        <mesh
+          position={[0.22, -0.48, -0.22]}
+          rotation={[0.28, 0, -0.06]}
+          castShadow
+        >
+          <boxGeometry args={[0.18, 0.65, 0.07]} />
+          <meshStandardMaterial color={agent.accent} roughness={0.9} />
+        </mesh>
+      </group>
       <group ref={leftArm} position={[-0.43, 1.32, 0]}>
         <mesh position={[0, -0.23, 0]}>
           <capsuleGeometry args={[0.08, 0.3, 4, 8]} />
@@ -1084,11 +1152,11 @@ function Scene({
 }) {
   const sunPhase = (minute / 1440) * Math.PI * 2 - Math.PI / 2;
   const daylight = THREE.MathUtils.clamp(Math.sin(sunPhase), 0, 1);
-  const sky = new THREE.Color("#050914")
-    .lerp(new THREE.Color("#8ab6c6"), daylight * 0.72)
+  const sky = new THREE.Color("#0d1230")
+    .lerp(new THREE.Color("#a9ced5"), daylight * 0.78)
     .getStyle();
-  const fog = new THREE.Color("#07100f")
-    .lerp(new THREE.Color("#9eb9ad"), daylight * 0.55)
+  const fog = new THREE.Color("#171a3b")
+    .lerp(new THREE.Color("#cadbd2"), daylight * 0.62)
     .getStyle();
   const sunPosition: [number, number, number] = [
     Math.cos(sunPhase) * 18,
@@ -1120,7 +1188,7 @@ function Scene({
   return (
     <>
       <color attach="background" args={[sky]} />
-      <fog attach="fog" args={[fog, 20, 48]} />
+      <fog attach="fog" args={[fog, 22, 51]} />
       <ambientLight
         intensity={0.18 + daylight * 0.72}
         color={daylight > 0.2 ? "#d8e5d6" : "#6378a0"}
@@ -1139,10 +1207,24 @@ function Scene({
         <sphereGeometry args={[0.75, 18, 18]} />
         <meshBasicMaterial color={daylight > 0 ? "#fff0ae" : "#c8d6ff"} />
       </mesh>
+      <mesh position={[0, -1.35, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[21.8, 18.2, 2.7, 32]} />
+        <meshStandardMaterial
+          color={daylight > 0.15 ? "#657461" : "#293448"}
+          roughness={1}
+        />
+      </mesh>
+      <mesh position={[0, -3.6, 0]} castShadow>
+        <coneGeometry args={[18.1, 4.5, 28]} />
+        <meshStandardMaterial
+          color={daylight > 0.15 ? "#555967" : "#24273c"}
+          roughness={0.95}
+        />
+      </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[22, 64]} />
         <meshStandardMaterial
-          color={daylight > 0.15 ? "#294b31" : "#142b20"}
+          color={daylight > 0.15 ? "#47745b" : "#1d3740"}
           roughness={1}
         />
       </mesh>
@@ -1203,6 +1285,17 @@ function Scene({
       ))}
       <Jacaranda x={-4.6} z={0.8} />
       <Jacaranda x={4.7} z={0.5} />
+      <ReflectionGarden />
+      {[
+        [-5.5, -1.3],
+        [-2.8, -1.3],
+        [2.8, -1.3],
+        [5.5, -1.3],
+        [-0.7, 4.8],
+        [0.7, 7.1],
+      ].map(([x, z], i) => (
+        <StoryLantern key={`lantern-${i}`} x={x} z={z} />
+      ))}
       <GothicHall position={[0, 0, -7]} />
       <CampusDetails />
       <Classroom
@@ -1535,7 +1628,7 @@ export default function Home() {
           </span>
           <div>
             <b>LUMORA</b>
-            <small>University of Sydney AI Campus Lab</small>
+            <small>A poetic autonomous campus</small>
           </div>
         </div>
         <div className="world-status">
