@@ -55,8 +55,6 @@ type Agent = {
   pos: [number, number, number];
   target: [number, number, number];
   speech?: string;
-  destination?: string;
-  arrived?: boolean;
   relations: Record<string, number>;
 };
 type EventItem = {
@@ -645,103 +643,51 @@ const START_EVENTS: EventItem[] = [
     text: "The morning compute window opened and training capacity recovered",
   },
 ];
-// A compressed, walkable interpretation of the Camperdown/Darlington campus.
-// Columns follow Western Avenue, the Quadrangle/Fisher axis, Eastern Avenue and
-// the Victoria Park edge; rows follow the northern, Science Road and southern axes.
-const CAMPUS_X = [-17, -7, 3, 10, 17];
-const CAMPUS_Z = [-13, -4, 5, 14];
-const ROAD_NODES: [number, number, number][] = CAMPUS_Z.flatMap((z) =>
-  CAMPUS_X.map((x) => [x, 0, z] as [number, number, number]),
-);
-const ROAD_EDGES: [number, number][] = [
-  ...CAMPUS_Z.flatMap((_, row) =>
-    CAMPUS_X.slice(0, -1).map((__, column) => [
-      row * CAMPUS_X.length + column,
-      row * CAMPUS_X.length + column + 1,
-    ] as [number, number]),
-  ),
-  ...CAMPUS_X.flatMap((_, column) =>
-    CAMPUS_Z.slice(0, -1).map((__, row) => [
-      row * CAMPUS_X.length + column,
-      (row + 1) * CAMPUS_X.length + column,
-    ] as [number, number]),
-  ),
+const OUTER_ROAD_COUNT = 16;
+const INNER_ROAD_COUNT = 8;
+const ROAD_OFFSET = Math.PI / 8;
+const ROAD_NODES: [number, number, number][] = [
+  ...Array.from({ length: OUTER_ROAD_COUNT }, (_, index) => {
+    const angle = ROAD_OFFSET + (index / OUTER_ROAD_COUNT) * Math.PI * 2;
+    return [Math.cos(angle) * 18.7, 0, Math.sin(angle) * 18.7] as [
+      number,
+      number,
+      number,
+    ];
+  }),
+  ...Array.from({ length: INNER_ROAD_COUNT }, (_, index) => {
+    const angle = ROAD_OFFSET + (index / INNER_ROAD_COUNT) * Math.PI * 2;
+    return [Math.cos(angle) * 4.8, 0, Math.sin(angle) * 4.8] as [
+      number,
+      number,
+      number,
+    ];
+  }),
+  [0, 0, 0] as [number, number, number],
 ];
 const TARGETS = ROAD_NODES;
 
-const ACTIVITY_VENUES = [
-  {
-    name: "Generative AI Lab",
-    kind: "Research",
-    host: "Carslaw Building",
-    position: [7.2, 0, 3.7] as [number, number, number],
-    entrance: [10, 0, 5] as [number, number, number],
-    color: "#82e3dc",
-  },
-  {
-    name: "Web3 Protocol Lab",
-    kind: "Research",
-    host: "Engineering Precinct",
-    position: [-10.8, 0, 12.6] as [number, number, number],
-    entrance: [-7, 0, 14] as [number, number, number],
-    color: "#b99cff",
-  },
-  {
-    name: "Creator Studio",
-    kind: "Work",
-    host: "Abercrombie Building",
-    position: [-0.5, 0, 12.6] as [number, number, number],
-    entrance: [3, 0, 14] as [number, number, number],
-    color: "#79c8ef",
-  },
-  {
-    name: "Team Conference Room",
-    kind: "Discuss",
-    host: "Fisher Library",
-    position: [0.8, 0, -5.7] as [number, number, number],
-    entrance: [3, 0, -4] as [number, number, number],
-    color: "#8fe0ac",
-  },
-] as const;
-
-function venuePosition(
-  venue: (typeof ACTIVITY_VENUES)[number],
-): [number, number, number] {
-  return venue.position;
-}
-
-function venueEntrance(
-  venue: (typeof ACTIVITY_VENUES)[number],
-): [number, number, number] {
-  return venue.entrance;
-}
-
-function purposefulDestination(action: Action, id: string) {
-  const matching = ACTIVITY_VENUES.filter((venue) =>
-    action === "Gather" || action === "Rest"
-      ? venue.kind === (action === "Gather" ? "Build" : "Explore")
-      : venue.kind === action,
-  );
-  const pool = matching.length ? matching : ACTIVITY_VENUES;
-  const seed = [...id].reduce((sum, letter) => sum + letter.charCodeAt(0), 0);
-  const venue = pool[seed % pool.length];
-  const entrance = venueEntrance(venue);
-  const berth = (Math.floor(seed / Math.max(1, pool.length)) % 5) - 2;
-  const tangentX = 1;
-  const tangentZ = 0;
-  return {
-    target: [
-      entrance[0] + tangentX * berth * 0.72,
-      0,
-      entrance[2] + tangentZ * berth * 0.72,
-    ] as [number, number, number],
-    destination: venue.name,
-  };
-}
-
 function roadNeighbours(index: number): number[] {
-  return ROAD_EDGES.flatMap(([from, to]) =>
-    from === index ? [to] : to === index ? [from] : [],
+  if (index < OUTER_ROAD_COUNT) {
+    const neighbours = [
+      (index - 1 + OUTER_ROAD_COUNT) % OUTER_ROAD_COUNT,
+      (index + 1) % OUTER_ROAD_COUNT,
+    ];
+    if (index % 2 === 0) neighbours.push(OUTER_ROAD_COUNT + index / 2);
+    return neighbours;
+  }
+  if (index < OUTER_ROAD_COUNT + INNER_ROAD_COUNT) {
+    const inner = index - OUTER_ROAD_COUNT;
+    return [
+      OUTER_ROAD_COUNT + ((inner - 1 + INNER_ROAD_COUNT) % INNER_ROAD_COUNT),
+      OUTER_ROAD_COUNT + ((inner + 1) % INNER_ROAD_COUNT),
+      inner * 2,
+      OUTER_ROAD_COUNT + INNER_ROAD_COUNT,
+    ];
+  }
+  return Array.from(
+    { length: INNER_ROAD_COUNT },
+    (_, inner) => OUTER_ROAD_COUNT + inner,
   );
 }
 
@@ -761,7 +707,6 @@ function closestRoadNode(position: THREE.Vector3): number {
 function buildRoadRoute(
   from: THREE.Vector3,
   destination: THREE.Vector3,
-  laneOffset = new THREE.Vector3(),
 ): THREE.Vector3[] {
   const start = closestRoadNode(from);
   const finish = closestRoadNode(destination);
@@ -784,15 +729,11 @@ function buildRoadRoute(
   }
   const route = indexes.map(
     (index) =>
-      new THREE.Vector3(
-        ROAD_NODES[index][0] + laneOffset.x,
-        0.015,
-        ROAD_NODES[index][2] + laneOffset.z,
-      ),
+      new THREE.Vector3(ROAD_NODES[index][0], 0.06, ROAD_NODES[index][2]),
   );
   const routeEnd = route.at(-1);
   if (!routeEnd || routeEnd.distanceTo(destination) > 0.12) {
-    route.push(new THREE.Vector3(destination.x, 0.015, destination.z));
+    route.push(new THREE.Vector3(destination.x, 0.06, destination.z));
   }
   return route;
 }
@@ -878,10 +819,10 @@ const RESEARCH_TOPICS = [
 ];
 
 function expansionPosition(index: number): [number, number, number] {
-  const slotsPerRing = 8;
+  const slotsPerRing = 10;
   const ring = Math.floor(index / slotsPerRing);
-  const angle = ((index % slotsPerRing) / slotsPerRing) * Math.PI * 2;
-  const radius = 7.35 + ring * 2.15;
+  const angle = ((index % slotsPerRing) / slotsPerRing) * Math.PI * 2 + 0.3;
+  const radius = 8.5 + ring * 3;
   return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
 }
 
@@ -1450,64 +1391,6 @@ function Classroom({
     </group>
   );
 }
-
-function ActivityVenue({ venue }: { venue: (typeof ACTIVITY_VENUES)[number] }) {
-  const [x, , z] = venuePosition(venue);
-  return (
-    <group position={[x, 0, z]}>
-      <RoundedBox
-        args={[1.5, 0.72, 0.42]}
-        radius={0.09}
-        smoothness={5}
-        position={[0, 0.5, 0]}
-        castShadow
-      >
-        <meshStandardMaterial
-          color="#25332f"
-          roughness={0.7}
-          metalness={0.1}
-        />
-      </RoundedBox>
-      <mesh position={[0, 0.5, 0.22]}>
-        <planeGeometry args={[1.18, 0.38]} />
-        <meshStandardMaterial
-          color={venue.color}
-          emissive={venue.color}
-          emissiveIntensity={0.75}
-        />
-      </mesh>
-      <pointLight
-        position={[0, 1.1, 0.5]}
-        color={venue.color}
-        intensity={1.1}
-        distance={3.5}
-      />
-      <WorldLabel position={[0, 1.55, 0]} color={venue.color}>
-        {venue.name} · {venue.host}
-      </WorldLabel>
-    </group>
-  );
-}
-
-function CampusPath({ from, to, width = 1.05 }: {
-  from: [number, number, number];
-  to: [number, number, number];
-  width?: number;
-}) {
-  const dx = to[0] - from[0];
-  const dz = to[2] - from[2];
-  const length = Math.hypot(dx, dz);
-  return (
-    <mesh
-      position={[(from[0] + to[0]) / 2, 0.035, (from[2] + to[2]) / 2]}
-      rotation={[0, Math.atan2(dx, dz), 0]}
-      receiveShadow
-    >
-      <boxGeometry args={[width, 0.055, length]} />
-      <meshStandardMaterial color="#a2947f" roughness={0.98} />
-    </mesh>
-  );
-}
 function GrowthBuilding({
   project,
   index,
@@ -1598,20 +1481,14 @@ function WorldLabel({
 }
 function Avatar({
   agent,
-  spawnIndex,
   selected,
   onSelect,
-  onArrive,
-  canTalk,
   paused,
   speed,
 }: {
   agent: Agent;
-  spawnIndex: number;
   selected: boolean;
   onSelect: () => void;
-  onArrive: () => void;
-  canTalk: boolean;
   paused: boolean;
   speed: number;
 }) {
@@ -1629,18 +1506,6 @@ function Avatar({
   const direction = useMemo(() => new THREE.Vector3(), []);
   const route = useRef<THREE.Vector3[]>([]);
   const lastTargetKey = useRef("");
-  const arrivalReported = useRef("");
-  const initialized = useRef(false);
-  const laneOffset = useMemo(() => {
-    const angle = spawnIndex * 2.399963;
-    return new THREE.Vector3(Math.cos(angle) * 0.26, 0, Math.sin(angle) * 0.26);
-  }, [spawnIndex]);
-  useEffect(() => {
-    if (!ref.current || initialized.current) return;
-    const spawn = ROAD_NODES[spawnIndex % ROAD_NODES.length];
-    ref.current.position.set(spawn[0], 0.015, spawn[2]);
-    initialized.current = true;
-  }, [spawnIndex]);
   const walkSpeed = useMemo(
     () =>
       1.05 +
@@ -1654,7 +1519,7 @@ function Avatar({
     if (paused) {
       ref.current.position.y = THREE.MathUtils.damp(
         ref.current.position.y,
-        0.015,
+        0.06,
         12,
         dt,
       );
@@ -1662,12 +1527,11 @@ function Avatar({
     }
     const targetKey = `${target.x.toFixed(2)}:${target.z.toFixed(2)}`;
     if (lastTargetKey.current !== targetKey) {
-      route.current = buildRoadRoute(ref.current.position, target, laneOffset);
+      route.current = buildRoadRoute(ref.current.position, target);
       if (route.current[0]?.distanceTo(ref.current.position) < 0.25) {
         route.current.shift();
       }
       lastTargetKey.current = targetKey;
-      arrivalReported.current = "";
     }
     let waypoint = route.current[0] || target;
     direction.set(
@@ -1687,14 +1551,6 @@ function Avatar({
       distance = direction.length();
     }
     const walking = distance > 0.18;
-    if (
-      !walking &&
-      route.current.length === 0 &&
-      arrivalReported.current !== targetKey
-    ) {
-      arrivalReported.current = targetKey;
-      onArrive();
-    }
     const motion = THREE.MathUtils.smoothstep(distance, 0.12, 0.9);
     const simPace = Math.sqrt(speed);
     if (walking) {
@@ -1710,7 +1566,7 @@ function Avatar({
     const strideTime = state.clock.elapsedTime * 5.4 * walkSpeed * simPace;
     ref.current.position.y = THREE.MathUtils.damp(
       ref.current.position.y,
-      0.015 + (walking ? Math.abs(Math.sin(strideTime)) * 0.035 * motion : 0),
+      0.06 + (walking ? Math.abs(Math.sin(strideTime)) * 0.045 * motion : 0),
       12,
       dt,
     );
@@ -1731,6 +1587,7 @@ function Avatar({
   return (
     <group
       ref={ref}
+      position={agent.pos}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
@@ -1752,7 +1609,7 @@ function Avatar({
           <meshBasicMaterial color="#f5da73" transparent opacity={0.85} />
         </mesh>
       )}
-      {!selected && canTalk && (
+      {!selected && agent.action === "Discuss" && (
         <Billboard position={[0, 2.42, 0]}>
           <Html center>
             <div
@@ -1846,7 +1703,7 @@ function Avatar({
           <meshStandardMaterial color="#a8b0ac" metalness={0.7} />
         </mesh>
       </group>
-      <group ref={leftLeg} position={[-0.2, 0.58, 0]}>
+      <group ref={leftLeg} position={[-0.2, 0.75, 0]}>
         <mesh position={[0, -0.25, 0]}>
           <capsuleGeometry args={[0.1, 0.32, 4, 8]} />
           <meshStandardMaterial color="#77848a" metalness={0.6} />
@@ -1860,7 +1717,7 @@ function Avatar({
           <meshStandardMaterial color="#11191c" />
         </RoundedBox>
       </group>
-      <group ref={rightLeg} position={[0.2, 0.58, 0]}>
+      <group ref={rightLeg} position={[0.2, 0.75, 0]}>
         <mesh position={[0, -0.25, 0]}>
           <capsuleGeometry args={[0.1, 0.32, 4, 8]} />
           <meshStandardMaterial color="#77848a" metalness={0.6} />
@@ -1911,7 +1768,6 @@ function Scene({
   agents,
   selected,
   onSelect,
-  onArrive,
   paused,
   speed,
   follow,
@@ -1923,7 +1779,6 @@ function Scene({
   agents: Agent[];
   selected: string;
   onSelect: (id: string) => void;
-  onArrive: (id: string) => void;
   paused: boolean;
   speed: number;
   follow: string | null;
@@ -1945,6 +1800,28 @@ function Scene({
     Math.sin(sunPhase) * 18,
     -8,
   ];
+  const trees = useMemo(
+    () => [
+      [-10, -8, 1.2],
+      [-8, -5, 0.8],
+      [-11, -1, 1],
+      [-9, 3, 0.9],
+      [-10, 7, 1.25],
+      [-6, -8, 0.9],
+      [-2, -9, 1.15],
+      [2, -9, 0.8],
+      [5, -9, 1.1],
+      [9, -8, 0.9],
+      [11, -5, 1.2],
+      [11, 0, 0.9],
+      [10, 6, 1.1],
+      [7, 9, 0.9],
+      [3, 9, 1.15],
+      [-2, 9, 0.8],
+      [-7, 9, 1.1],
+    ],
+    [],
+  );
   return (
     <>
       <color attach="background" args={[sky]} />
@@ -1981,6 +1858,68 @@ function Scene({
           roughness={0.95}
         />
       </mesh>
+      <mesh
+        position={[0, 0.025, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <ringGeometry args={[18.05, 19.35, 96]} />
+        <meshStandardMaterial color="#847766" roughness={0.98} />
+      </mesh>
+      <mesh
+        position={[0, 0.03, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <ringGeometry args={[4.12, 5.48, 64]} />
+        <meshStandardMaterial color="#8a7c69" roughness={0.98} />
+      </mesh>
+      {Array.from({ length: INNER_ROAD_COUNT }, (_, index) => {
+        const angle = ROAD_OFFSET + (index / INNER_ROAD_COUNT) * Math.PI * 2;
+        return (
+          <mesh
+            key={`road-${index}`}
+            position={[Math.cos(angle) * 11.75, 0.032, Math.sin(angle) * 11.75]}
+            rotation={[-Math.PI / 2, 0, -angle]}
+            receiveShadow
+          >
+            <planeGeometry args={[1.18, 13.9]} />
+            <meshStandardMaterial color="#8a7c69" roughness={0.98} />
+          </mesh>
+        );
+      })}
+      <FloatingOutpost
+        position={[25, 4.2, -10]}
+        color="#ffd277"
+        label="Astral Systems Annex"
+      />
+      <FloatingOutpost
+        position={[-24, 6.2, -12]}
+        color="#a7c8ff"
+        label="Sky Archive"
+      />
+      <mesh
+        position={[20.2, 2.15, -8.4]}
+        rotation={[0, -0.42, 0.32]}
+        castShadow
+        receiveShadow
+      >
+        <boxGeometry args={[10.5, 0.34, 1.35]} />
+        <meshStandardMaterial color="#938069" roughness={0.92} />
+      </mesh>
+      {[-3.8, -1.8, 0.2, 2.2, 4.2].map((offset) => (
+        <mesh
+          key={offset}
+          position={[
+            20.2 + offset * 0.9,
+            2.55 + offset * 0.28,
+            -8.4 - offset * 0.38,
+          ]}
+        >
+          <boxGeometry args={[0.1, 0.9, 1.65]} />
+          <meshStandardMaterial color="#6e5d50" />
+        </mesh>
+      ))}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[22, 64]} />
         <meshStandardMaterial
@@ -1988,56 +1927,128 @@ function Scene({
           roughness={1}
         />
       </mesh>
-      {ROAD_EDGES.map(([from, to]) => (
-        <CampusPath
-          key={`campus-path-${from}-${to}`}
-          from={ROAD_NODES[from]}
-          to={ROAD_NODES[to]}
-          width={from % CAMPUS_X.length === 2 && to % CAMPUS_X.length === 2 ? 1.45 : 1.02}
+      <mesh
+        position={[0, 0.01, 15.8]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[27, 1.6]} />
+        <meshStandardMaterial color="#5f5e5b" roughness={0.95} />
+      </mesh>
+      <mesh
+        position={[0, 0.012, 11]}
+        rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+        receiveShadow
+      >
+        <planeGeometry args={[1.2, 31]} />
+        <meshStandardMaterial color="#756851" roughness={0.95} />
+      </mesh>
+      <mesh
+        position={[0, 0.02, -1.3]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[11, 8]} />
+        <meshStandardMaterial color="#385c36" roughness={1} />
+      </mesh>
+      <mesh
+        position={[0, 0.035, -1.2]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[1.05, 13]} />
+        <meshStandardMaterial color="#8b7354" roughness={0.95} />
+      </mesh>
+      <mesh
+        position={[0, 0.04, -1.2]}
+        rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+        receiveShadow
+      >
+        <planeGeometry args={[0.8, 10.5]} />
+        <meshStandardMaterial color="#7e6a50" roughness={0.95} />
+      </mesh>
+      <mesh
+        position={[0, 0.015, 0]}
+        rotation={[-Math.PI / 2, 0, 0.18]}
+        receiveShadow
+      >
+        <planeGeometry args={[4.2, 30]} />
+        <meshStandardMaterial color="#6b5b3e" roughness={1} />
+      </mesh>
+      <mesh position={[-2, 0.025, 1]} rotation={[-Math.PI / 2, 0, -1.12]}>
+        <planeGeometry args={[2.6, 17]} />
+        <meshStandardMaterial color="#6b5b3e" roughness={1} />
+      </mesh>
+      {trees.map((t, i) => (
+        <Tree key={i} x={t[0]} z={t[1]} s={t[2]} />
+      ))}
+      <Jacaranda x={-4.6} z={0.8} />
+      <Jacaranda x={4.7} z={0.5} />
+      <ReflectionGarden />
+      <WaterGarden />
+      {[
+        [-5.5, -1.3],
+        [-2.8, -1.3],
+        [2.8, -1.3],
+        [5.5, -1.3],
+        [-0.7, 4.8],
+        [0.7, 7.1],
+        [-8.5, 11.5],
+        [-3.8, 12.8],
+        [4.2, 12.8],
+        [8.8, 10.5],
+        [-12, -4.5],
+        [12, -4.2],
+      ].map(([x, z], i) => (
+        <StoryLantern key={`lantern-${i}`} x={x} z={z} />
+      ))}
+      <GothicHall position={[0, 0, -7]} />
+      <CampusDetails />
+      <Classroom
+        position={[-7.4, 0, 4.2]}
+        label="AI Safety & Alignment Classroom"
+        color="#f1c875"
+      />
+      <Classroom
+        position={[7.2, 0, 4.5]}
+        label="Smart Contract Seminar Room"
+        color="#8fd7ff"
+      />
+      <House position={[0, 0, 7.8]} color="#49675c" research />
+      <ModernLab position={[7.4, 0, -4.5]} glow="#8de7df" />
+      <ResearchDome
+        position={[-7.6, 0, -4.5]}
+        label="Web3 Protocol Lab"
+        color="#b59aff"
+      />
+      <ResearchDome
+        position={[-9.5, 0, 1]}
+        label="Privacy Computing Lab"
+        color="#7ee0ad"
+      />
+      <ResearchDome
+        position={[9.5, 0, 0.8]}
+        label="Embodied AI Lab"
+        color="#ff9b71"
+      />
+      {Array.from({ length: completed }, (_, index) => (
+        <GrowthBuilding
+          key={`growth-${index}`}
+          project={PROJECTS[index % PROJECTS.length]}
+          index={index}
+          level={projectLevels[index] || 1}
         />
       ))}
-      <WorldLabel position={[-17, 0.55, -8.5]} color="#f1d49a">Western Avenue</WorldLabel>
-      <WorldLabel position={[3, 0.55, 0.5]} color="#f1d49a">Eastern Avenue</WorldLabel>
-      <WorldLabel position={[-2, 0.55, 5]} color="#e9d8b8">Science Road</WorldLabel>
-      <WorldLabel position={[0, 0.55, 14]} color="#e9d8b8">Darlington Walk</WorldLabel>
-      <GothicHall position={[-12, 0, -8.5]} />
-      <WorldLabel position={[-12, 4.9, -8.5]} color="#ffe0a3">The Quadrangle · Great Hall</WorldLabel>
-      <mesh position={[-12, 0.028, 0.3]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[7.1, 6.6]} />
-        <meshStandardMaterial color="#63855b" roughness={1} />
-      </mesh>
-      <WorldLabel position={[-12, 0.72, 0.2]} color="#e8efb5">Front Lawn</WorldLabel>
-      <CampusBuilding position={[-2, 0, -8.5]} size={[6.4, 3.2, 4.5]} label="Fisher Library" color="#a69a86" glow="#bde6d7" />
-      <CampusBuilding position={[6.5, 0, -8.5]} size={[5.4, 3.15, 4.4]} label="New Law Building" color="#817d79" glow="#d9e8ef" />
-      <CampusBuilding position={[-2, 0, 0.4]} size={[6.1, 2.8, 4.5]} label="Chemistry · Madsen" color="#9a7d64" glow="#f2c98c" />
-      <CampusBuilding position={[6.5, 0, 0.4]} size={[5.4, 3.3, 4.5]} label="Carslaw Building" color="#8e8a7d" glow="#9ee2da" />
-      <CampusBuilding position={[-12, 0, 9.5]} size={[7.1, 3.05, 4.5]} label="Engineering Precinct" color="#8a7665" glow="#bdadff" />
-      <CampusBuilding position={[-2, 0, 9.5]} size={[6.1, 3.25, 4.5]} label="Abercrombie Building" color="#92775e" glow="#86d2f3" />
-      <CampusBuilding position={[6.5, 0, 9.5]} size={[5.4, 2.75, 4.4]} label="Wentworth Building" color="#9a8069" glow="#ffd395" />
-      <CampusBuilding position={[13.5, 0, -8.5]} size={[5.1, 3.5, 4.4]} label="Chau Chak Wing Museum" color="#746d66" glow="#e9d5a5" />
-      <mesh position={[19.4, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[3.8, 27]} />
-        <meshStandardMaterial color="#557c59" roughness={1} />
-      </mesh>
-      <WorldLabel position={[19, 0.65, 0]} color="#d9efad">Victoria Park</WorldLabel>
-      {ACTIVITY_VENUES.map((venue) => <ActivityVenue key={venue.name} venue={venue} />)}
-      {[
-        [-19.3, -9.5, 0.72],
-        [-19.1, 9.4, 0.78],
-        [-14, 3, 0.68],
-        [-9.4, 2.7, 0.66],
-        [14.2, 2.8, 0.74],
-        [14.5, 10.7, 0.8],
-        [14.1, -1.8, 0.7],
-        [19.2, -11.6, 0.76],
-        [19.1, 11.8, 0.72],
-      ].map(([x, z, scale], index) => (
-        <Tree key={`campus-tree-${index}`} x={x} z={z} s={scale} />
-      ))}
-      <WorldLabel position={[13.5, 2.1, 0]} color="#ffe0a3">
-        Campus Commons · Collaboration Plaza
+      <WorldLabel position={[0, 7.2, -7]}>
+        University of Sydney · Quadrangle
       </WorldLabel>
-      <group position={[13.5, 0, 0]}>
+      <WorldLabel position={[7.4, 3.8, -4.5]} color="#9fdced">
+        Generative AI Laboratory
+      </WorldLabel>
+      <WorldLabel position={[0, 2.1, 0]} color="#ffe0a3">
+        Quadrangle Lawn · Commons
+      </WorldLabel>
+      <group position={[0, 0, 0]}>
         <mesh position={[0, 0.36, 0]} castShadow>
           <cylinderGeometry args={[1.75, 1.9, 0.72, 20]} />
           <meshStandardMaterial
@@ -2080,25 +2091,33 @@ function Scene({
           Lumora Collaboration Table
         </WorldLabel>
       </group>
-      {agents.map((a, index) => (
+      <group position={expansionPosition(completed)}>
+        <mesh position={[0, 0.08, 0]}>
+          <boxGeometry args={[3.5, 0.16, 3]} />
+          <meshStandardMaterial color="#82715f" />
+        </mesh>
+        {[
+          [-1.3, -1],
+          [1.3, -1],
+          [-1.3, 1],
+          [1.3, 1],
+        ].map((p, i) => (
+          <mesh key={i} position={[p[0], progress > 65 ? 1.1 : 0.65, p[1]]}>
+            <boxGeometry args={[0.16, progress > 65 ? 2.2 : 1.3, 0.16]} />
+            <meshStandardMaterial color="#d3a262" />
+          </mesh>
+        ))}
+        <WorldLabel position={[0, 2.5, 0]} color="#f7d873">
+          Building: {PROJECTS[completed % PROJECTS.length].name} ·{" "}
+          {Math.round(progress)}%
+        </WorldLabel>
+      </group>
+      {agents.map((a) => (
         <Avatar
           key={a.id}
           agent={a}
-          spawnIndex={index}
           selected={selected === a.id}
           onSelect={() => onSelect(a.id)}
-          onArrive={() => onArrive(a.id)}
-          canTalk={Boolean(
-            a.arrived &&
-            a.action === "Discuss" &&
-            agents.some(
-              (other) =>
-                other.id !== a.id &&
-                other.arrived &&
-                other.action === "Discuss" &&
-                other.destination === a.destination,
-            ),
-          )}
           paused={paused}
           speed={speed}
         />
@@ -2124,17 +2143,7 @@ function Scene({
 const formatTime = (m: number) =>
   `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 export default function Home() {
-  const [agents, setAgents] = useState(() =>
-    PEOPLE.map((person) => {
-      const purpose = purposefulDestination(person.action, person.id);
-      return {
-        ...person,
-        target: purpose.target,
-        destination: purpose.destination,
-        arrived: false,
-      };
-    }),
-  );
+  const [agents, setAgents] = useState(PEOPLE);
   const [selected, setSelected] = useState("karina");
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -2282,14 +2291,10 @@ export default function Home() {
                   `${candidate[0].toFixed(2)}:${candidate[2].toFixed(2)}`,
                 ),
             );
-            const purpose = purposefulDestination(action, cur.id);
-            const t = occupied.has(
-              `${purpose.target[0].toFixed(2)}:${purpose.target[2].toFixed(2)}`,
-            )
-              ? availableTargets[
-                  Math.floor(Math.random() * availableTargets.length)
-                ] || purpose.target
-              : purpose.target;
+            const t =
+              availableTargets[
+                Math.floor(Math.random() * availableTargets.length)
+              ] || TARGETS[Math.floor(Math.random() * TARGETS.length)];
             const thoughts: Record<Action, string> = {
               Explore: "Another lab may have a reusable dataset.",
               Gather: "Secure the compute and samples the team needs most.",
@@ -2308,8 +2313,6 @@ export default function Home() {
               thought: thoughts[action],
               reason: `A change in the environment is relevant to “${cur.goal}”`,
               target: t,
-              destination: purpose.destination,
-              arrived: false,
               energy: Math.max(
                 18,
                 Math.min(100, cur.energy + (action === "Rest" ? 12 : -3)),
@@ -2339,18 +2342,18 @@ export default function Home() {
               ];
             const trust = a.relations[b.id] ?? 50;
             const conflict = trust < 50 || Math.random() < 0.18;
+            const outcome = conflict
+              ? `${a.name} challenged ${b.name}'s hypothesis; they added a control group`
+              : `${a.name} and ${b.name} reached a new consensus and agreed to share replication results`;
             const memory = `${formatTime(next)} — discussed with ${b.name}: ${topic}`;
             const delta = conflict ? -2 : 3;
-            const meetingVenues = ACTIVITY_VENUES.filter(
-              (venue) => venue.kind === "Discuss",
-            );
-            const meetingVenue =
-              meetingVenues[
-                (Math.floor(next / 10) + first + second) % meetingVenues.length
+            const meetingNode =
+              TARGETS[
+                (Math.floor(next / 10) + first + second) % TARGETS.length
               ];
-            const meetingNode = venueEntrance(meetingVenue);
-            const tangentX = -Math.sin(meetingVenue.angle);
-            const tangentZ = Math.cos(meetingVenue.angle);
+            const radius = Math.hypot(meetingNode[0], meetingNode[2]);
+            const tangentX = radius > 0.1 ? -meetingNode[2] / radius : 1;
+            const tangentZ = radius > 0.1 ? meetingNode[0] / radius : 0;
             const firstMeeting: [number, number, number] = [
               meetingNode[0] + tangentX * 0.68,
               0,
@@ -2361,11 +2364,7 @@ export default function Home() {
               0,
               meetingNode[2] - tangentZ * 0.68,
             ];
-            addEvent(
-              `${a.name} invited ${b.name} to ${meetingVenue.name}｜${topic}`,
-              "talk",
-              next,
-            );
+            addEvent(`${outcome}｜${topic}`, "talk", next);
             return old.map((person, index) => {
               if (index !== first && index !== second) return person;
               const partner = index === first ? b : a;
@@ -2373,8 +2372,6 @@ export default function Home() {
                 ...person,
                 action: "Discuss",
                 target: index === first ? firstMeeting : secondMeeting,
-                destination: meetingVenue.name,
-                arrived: false,
                 speech:
                   index === first
                     ? `From a ${person.skills[0]} perspective, I want to test: ${topic}`
@@ -2433,15 +2430,6 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [paused, speed, addEvent, day, completed]);
   const observerLevel = 1 + Math.floor(observerXp / 100);
-  const markAgentArrived = useCallback((id: string) => {
-    setAgents((current) =>
-      current.map((person) =>
-        person.id === id && !person.arrived
-          ? { ...person, arrived: true }
-          : person,
-      ),
-    );
-  }, []);
   const guideProject = () => {
     if (knowledge < 10 || wood < 10) return;
     setKnowledge((value) => value - 10);
@@ -2490,17 +2478,7 @@ export default function Home() {
     const raw = localStorage.getItem("lumora-world-en-v1");
     if (!raw) return;
     const s = JSON.parse(raw) as Snapshot;
-    setAgents(
-      s.agents.map((person) => {
-        const purpose = purposefulDestination(person.action, person.id);
-        return {
-          ...person,
-          target: purpose.target,
-          destination: purpose.destination,
-          arrived: false,
-        };
-      }),
-    );
+    setAgents(s.agents);
     setMinute(s.minute);
     setDay(s.day || 12);
     setObserverXp(s.observerXp || 0);
@@ -2679,7 +2657,6 @@ export default function Home() {
               agents={agents}
               selected={selected}
               onSelect={selectAgent}
-              onArrive={markAgentArrived}
               paused={paused}
               speed={speed}
               follow={follow}
@@ -2880,11 +2857,7 @@ export default function Home() {
               </span>
               <div>
                 <b>{agent.goal}</b>
-                <small>
-                  Current action · {agent.action}
-                  {agent.destination ? ` at ${agent.destination}` : ""}
-                  {agent.arrived ? " · Arrived" : " · En route"}
-                </small>
+                <small>Current action · {agent.action}</small>
               </div>
             </div>
           </section>
