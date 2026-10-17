@@ -1358,7 +1358,17 @@ function Avatar({
         e.stopPropagation();
         onSelect();
       }}
+      onPointerOver={() => {
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerOut={() => {
+        document.body.style.cursor = "default";
+      }}
     >
+      <mesh position={[0, 1.2, 0]}>
+        <capsuleGeometry args={[0.62, 1.35, 6, 12]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
       {selected && (
         <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.55, 0.72, 32]} />
@@ -1475,14 +1485,13 @@ function Avatar({
           <meshStandardMaterial color="#11191c" />
         </RoundedBox>
       </group>
-      {(selected || agent.action === "Discuss") && (
+      {selected && (
         <Billboard position={[0, 2.5, 0]}>
           <Html center>
             <div className="agent-bubble">
               <strong>
                 {agent.name} · Lv.{agent.level || 1}
               </strong>
-              <span>{agent.speech || agent.thought}</span>
               <i>{agent.action}</i>
             </div>
           </Html>
@@ -1814,9 +1823,23 @@ export default function Home() {
   const [follow, setFollow] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [showRoster, setShowRoster] = useState(false);
-  const [showInspector, setShowInspector] = useState(false);
+  const [showInspector, setShowInspector] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
   const agent = agents.find((a) => a.id === selected) || agents[0];
+  const selectAgent = (id: string) => {
+    setSelected(id);
+    setShowInspector(true);
+    setShowRoster(false);
+    if (typeof window !== "undefined" && window.innerWidth <= 760) {
+      window.setTimeout(
+        () =>
+          document
+            .querySelector(".inspector-drawer")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        80,
+      );
+    }
+  };
   const dayPhase =
     minute < 300
       ? "Late Night"
@@ -2198,10 +2221,7 @@ export default function Home() {
               {agents.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => {
-                    setSelected(a.id);
-                    setShowInspector(true);
-                  }}
+                  onClick={() => selectAgent(a.id)}
                   className={selected === a.id ? "selected" : ""}
                 >
                   <span className="mini-avatar" style={{ background: a.color }}>
@@ -2276,11 +2296,7 @@ export default function Home() {
             <Scene
               agents={agents}
               selected={selected}
-              onSelect={(id) => {
-                setSelected(id);
-                setShowInspector(true);
-                setShowRoster(false);
-              }}
+              onSelect={selectAgent}
               paused={paused}
               speed={speed}
               follow={follow}
